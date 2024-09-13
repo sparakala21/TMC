@@ -1,0 +1,19 @@
+Technical Debts are things our app should have
+- menus
+- - titles
+  - ingredients
+  - a description
+  - allergen information
+  - easy ways to update the menu with new items limited time menus and promotions
+  - automating the above bullet
+- ordering
+- - a cart
+  - live updated pricing
+  - spice level and other food spec modifier on selection(1-10) but will except 15
+  - cool swipe mechanics
+- payment
+-  - Investigate stripe and other alternatives
+   - read their licenses
+   - use them in a way that is compliant
+- delivery(maybe)
+- - if They Decide they want to deliver then maybe we can support that too
