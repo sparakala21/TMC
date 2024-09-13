@@ -9,6 +9,7 @@ Technical Debts are things our app should have
 - ordering
 - - a cart
   - live updated pricing
+  - unavailability of items
   - spice level and other food spec modifier on selection(1-10) but will except 15
   - cool swipe mechanics
 - payment
