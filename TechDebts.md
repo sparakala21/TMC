@@ -18,6 +18,7 @@ Technical Debts are things our app should have
 -  - Investigate stripe and other alternatives
    - read their licenses
    - use them in a way that is compliant
+   - payment info caching
 - delivery(maybe)
 - - if They Decide they want to deliver then maybe we can support that too
 # DevOps Needs
