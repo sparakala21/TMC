@@ -1,4 +1,5 @@
 Technical Debts are things our app should have
+# Product Needs
 - menus
 - - titles
   - ingredients
@@ -12,9 +13,21 @@ Technical Debts are things our app should have
   - unavailability of items
   - spice level and other food spec modifier on selection(1-10) but will except 15
   - cool swipe mechanics
+  - support for customer rewards
 - payment
 -  - Investigate stripe and other alternatives
    - read their licenses
    - use them in a way that is compliant
 - delivery(maybe)
 - - if They Decide they want to deliver then maybe we can support that too
+# DevOps Needs
+- Setup Guide
+- CI/CD automation
+- Testing
+- - database validation
+  - frontend validation(QA Wolf or another alternative)
+  - 
+- Dockerized dev environment
+- Security measures
+- Github Workflows that trigger based on different workflow events
+- 
