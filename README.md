@@ -85,7 +85,7 @@ Now that Git is installed, you can clone the TMC repository from GitHub.
 In your Ubuntu terminal, navigate to the directory where you want to clone the project:
 
 ```bash
-cd /path/to/your/directory
+cd ~
 ```
 
 ### Step 2: Clone the Repository
