@@ -3,10 +3,13 @@
 
 Welcome to Thunder Mountain Curry's development setup guide! Follow these steps to get Node.js and Express up and running on your system.
 
-## Prerequisites
-Before you begin, ensure you have the following installed:
-- **Terminal access** (Linux or macOS recommended)
-- **Administrator privileges** (for installing software)
+## Step 1: Install WSL2
+WSL2 stands for windows subsystem for linux
+Open Windows Powershell and run the following command
+
+\`\`\`bash
+wsl --install
+\`\`\`
 
 ## Step 1: Install cURL
 cURL is required to download the Node Version Manager (NVM), which helps in managing different Node.js versions.
