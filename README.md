@@ -5,11 +5,8 @@ Welcome to Thunder Mountain Curry's development setup guide! Follow these steps 
 
 ## Step 1: Install WSL2
 WSL2 stands for windows subsystem for linux
-Open Windows Powershell and run the following command
+- [WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/install)
 
-\`\`\`bash
-wsl --install
-\`\`\`
 
 ## Step 1: Install cURL
 cURL is required to download the Node Version Manager (NVM), which helps in managing different Node.js versions.
