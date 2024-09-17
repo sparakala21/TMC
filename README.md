@@ -2,7 +2,7 @@ Here's the Markdown document detailing the steps to set up WSL, Git, clone a rep
 
 ---
 
-# Development Setup Guide (WSL, Git, Node.js)
+# Development Setup Guide (WSL, Git, Node.js, React)
 
 This guide will walk you through setting up WSL, installing Git, cloning the Thunder Mountain Curry (TMC) repository, setting up Node.js, and installing the project dependencies.
 
