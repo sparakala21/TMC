@@ -189,5 +189,3 @@ You have now successfully set up:
 You're all set to start developing!
 
 ---
-
-Let me know if you’d like to export this as a Markdown file!
