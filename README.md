@@ -1,6 +1,3 @@
-Here's the Markdown document detailing the steps to set up WSL, Git, clone a repository, set up Node.js, and install project dependencies:
-
----
 
 # Development Setup Guide (WSL, Git, Node.js, React)
 
@@ -154,7 +151,7 @@ Once Node.js is installed, you need to install the dependencies required for the
 Ensure you’re inside the TMC project directory:
 
 ```bash
-cd /path/to/TMC
+cd ~/TMC
 ```
 
 ### Step 2: Install the Dependencies
@@ -177,77 +174,99 @@ This will start the Thunder Mountain Curry (TMC) application locally.
 
 ---
 
-### Step 4: set up Open JDK for React
-Installation instructions below uses `Open JDK` version. If you want the Official Oracle version see [how to install Official JDK 11](https://www.linuxuprising.com/2019/06/new-oracle-java-11-installer-for-ubuntu.html)
+## 6. Set up OpenJDK and React Native Development
 
-* Install java-8-openjdk in WSL2 (*sudo apt-get install openjdk-11-jre* or use java11 *openjdk-11-jre*)
-* Install Android SDK cmdline tools in WSL2, see [here](https://gist.github.com/piouson/c14448ef7ab550b9002163cb97b86676)
-* Install nodejs in WSL2, see [here](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl)
+### Step 1: Install OpenJDK
 
-### Step 5: Enable access to adb server from WSL2
+To run a React Native application, you’ll need Java. Install OpenJDK with the following command:
 
-Set environment variable to access adb server, **WSL_HOST** is ip of **vEthernet (WSL)** interface in windows
-
+```bash
+sudo apt-get install openjdk-11-jre
 ```
+
+### Step 2: Install Android SDK Command-line Tools
+
+Follow the instructions in [this guide](https://gist.github.com/piouson/c14448ef7ab550b9002163cb97b86676) to install the Android SDK command-line tools in WSL2.
+
+### Step 3: Enable Access to ADB Server from WSL2
+
+Set the environment variable to access the ADB server. Use the following commands, where **WSL_HOST** is the IP of **vEthernet (WSL)** interface in Windows:
+
+```bash
 export WSL_HOST=$(tail -1 /etc/resolv.conf | cut -d' ' -f2)
 export ADB_SERVER_SOCKET=tcp:$WSL_HOST:5037
 ```
 
-### Step 6: Create react native app in WSL2
+### Step 4: Initialize the TMC App in React Native
 
+Instead of creating a new React Native app, initialize the TMC app that you cloned earlier.
+
+Make sure you're inside the **TMC** project directory:
+
+```bash
+cd ~/TMC
 ```
-npx react-native init testapp
+
+Then, ensure that all the React Native dependencies for the project are set up. If any React Native-specific setup is required, run:
+
+```bash
+npx react-native start
 ```
 
-### Step 7: Debug app in Visual Studio Code from WSL2 
+This will launch the Metro JavaScript bundler for the TMC project.
 
-Start vs code in WSL2
+### Step 5: Debug the TMC App in Visual Studio Code
 
-```
+Start Visual Studio Code in WSL2:
+
+```bash
 code .
 ```
 
-and install extensions for VS Code
+Install the following extensions for VS Code:
 
-* Remote - WSL
-* React Native Tools
+- **Remote - WSL**
+- **React Native Tools**
 
-VS Code UI runs in windows and the VS Code Server runs in WSL2, see [here](https://code.visualstudio.com/docs/remote/wsl)
+The VS Code UI runs in Windows, while the VS Code Server runs in WSL2. Refer to [this guide](https://code.visualstudio.com/docs/remote/wsl) for more details.
 
-Add a launch configuration in file launch.json with specified `type` and `target`, see [this StackOverFlow Answer](https://stackoverflow.com/questions/51666188/how-to-debug-react-native-apps-in-visual-studio-code#answer-56233781)
+### Step 6: Add Launch Configuration
 
-### Step 8: Build app in WSL2
+Add a launch configuration in the `launch.json` file with the specified `type` and `target`. Refer to [this StackOverflow answer](https://stackoverflow.com/questions/51666188/how-to-debug-react-native-apps-in-visual-studio-code#answer-56233781) for details.
 
-Add parameter in file proguard-rules<span>.</span>pro to ignore okhttp3 warnings
+### Step 7: Build the TMC App
 
-```
+Add a parameter in the `proguard-rules.pro` file to ignore OkHttp3 warnings:
+
+```bash
 -dontwarn okhttp3.internal.platform.*
 ```
 
-Edit npm scripts in `package.json`
+Then, edit the npm scripts in the `package.json` file:
 
-- Run `adb devices` to get `<device-name>`
+- Run `adb devices` to get your `<device-name>`.
 
 ```json
 "scripts": {
   "android": "react-native run-android --variant=debug --deviceId <device-name>",
-  "start": "react-native start --host 127.0.0.1",
+  "start": "react-native start --host 127.0.0.1"
 }
 ```
 
-First, start metro JavaScript bundler (`--host 127.0.0.1` binds bundler to localhost which is forwarded to windows)
+### Step 8: Start the Metro Bundler
 
-```
+To start the Metro JavaScript bundler, run:
+
+```bash
 yarn start
 ```
 
-Then, build and deploy app to device (`--deviceId <device-name>` specifies target device to deploy to)
+Then, build and deploy the app to the device:
 
-```
+```bash
 yarn android
 ```
 
-
-You're all set to start developing!
+You're all set to start developing with Thunder Mountain Curry!
 
 ---
