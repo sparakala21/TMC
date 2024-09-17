@@ -177,14 +177,76 @@ This will start the Thunder Mountain Curry (TMC) application locally.
 
 ---
 
-## Summary
+### Step 4: set up Open JDK for React
+Installation instructions below uses `Open JDK` version. If you want the Official Oracle version see [how to install Official JDK 11](https://www.linuxuprising.com/2019/06/new-oracle-java-11-installer-for-ubuntu.html)
 
-You have now successfully set up:
-1. WSL with Ubuntu.
-2. Git for version control.
-3. Cloned the Thunder Mountain Curry repository.
-4. Installed Node.js using NVM.
-5. Installed the project dependencies.
+* Install java-8-openjdk in WSL2 (*sudo apt-get install openjdk-11-jre* or use java11 *openjdk-11-jre*)
+* Install Android SDK cmdline tools in WSL2, see [here](https://gist.github.com/piouson/c14448ef7ab550b9002163cb97b86676)
+* Install nodejs in WSL2, see [here](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl)
+
+### Step 5: Enable access to adb server from WSL2
+
+Set environment variable to access adb server, **WSL_HOST** is ip of **vEthernet (WSL)** interface in windows
+
+```
+export WSL_HOST=$(tail -1 /etc/resolv.conf | cut -d' ' -f2)
+export ADB_SERVER_SOCKET=tcp:$WSL_HOST:5037
+```
+
+### Step 6: Create react native app in WSL2
+
+```
+npx react-native init testapp
+```
+
+### Step 7: Debug app in Visual Studio Code from WSL2 
+
+Start vs code in WSL2
+
+```
+code .
+```
+
+and install extensions for VS Code
+
+* Remote - WSL
+* React Native Tools
+
+VS Code UI runs in windows and the VS Code Server runs in WSL2, see [here](https://code.visualstudio.com/docs/remote/wsl)
+
+Add a launch configuration in file launch.json with specified `type` and `target`, see [this StackOverFlow Answer](https://stackoverflow.com/questions/51666188/how-to-debug-react-native-apps-in-visual-studio-code#answer-56233781)
+
+### Step 8: Build app in WSL2
+
+Add parameter in file proguard-rules<span>.</span>pro to ignore okhttp3 warnings
+
+```
+-dontwarn okhttp3.internal.platform.*
+```
+
+Edit npm scripts in `package.json`
+
+- Run `adb devices` to get `<device-name>`
+
+```json
+"scripts": {
+  "android": "react-native run-android --variant=debug --deviceId <device-name>",
+  "start": "react-native start --host 127.0.0.1",
+}
+```
+
+First, start metro JavaScript bundler (`--host 127.0.0.1` binds bundler to localhost which is forwarded to windows)
+
+```
+yarn start
+```
+
+Then, build and deploy app to device (`--deviceId <device-name>` specifies target device to deploy to)
+
+```
+yarn android
+```
+
 
 You're all set to start developing!
 
