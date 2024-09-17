@@ -24,7 +24,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
 
 After installation, confirm that NVM is installed correctly:
 
-\`\`\`bash
+\`\`\`
 command -v nvm
 \`\`\`
 
@@ -33,19 +33,19 @@ You should see \`nvm\` as the output, confirming NVM is ready to use.
 ## Step 3: Install Node.js
 Next, install the latest stable version of Node.js using NVM:
 
-\`\`\`bash
+\`\`\`
 nvm install --lts
 \`\`\`
 
 You can check the installed version with:
 
-\`\`\`bash
+\`\`\`
 nvm ls
 \`\`\`
 
 If you need a specific version, you can install it like so:
 
-\`\`\`bash
+\`\`\`
 nvm install <version>
 \`\`\`
 
@@ -54,7 +54,7 @@ For example, if the TMC app requires a particular version, replace \`<version>\`
 ## Step 4: Install the Latest Node.js Version
 To ensure you have the latest version of Node.js, use:
 
-\`\`\`bash
+\`\`\`
 nvm install node
 \`\`\`
 
@@ -63,7 +63,7 @@ This installs the latest available version of Node.js.
 ## Step 5: Install Project Dependencies
 With Node.js installed, navigate to the project directory and install the required dependencies:
 
-\`\`\`bash
+\`\`\`
 cd path/to/tmc-app
 npm install
 \`\`\`
@@ -73,7 +73,7 @@ This will pull all necessary packages defined in \`package.json\`.
 ## Step 6: Start the Application
 Once the dependencies are installed, you can start the app using:
 
-\`\`\`bash
+\`\`\`
 npm start
 \`\`\`
 
