@@ -181,6 +181,7 @@ This will start the Thunder Mountain Curry (TMC) application locally.
 To run a React Native application, you’ll need Java. Install OpenJDK with the following command:
 
 ```bash
+sudo apt update
 sudo apt-get install openjdk-11-jre
 ```
 
