@@ -19,6 +19,7 @@
   "homepage": "https://github.com/sparakala21/TMC#readme",
   "dependencies": {
     "express": "^4.21.0",
-    "latest-version": "^9.0.0"
+    "latest-version": "^9.0.0",
+    "mongodb": "^6.9.0"
   }
 }
