@@ -30,6 +30,26 @@ function testCreateEmptyMenuItem(){
     assert.strictEqual(menuItem.description, "", "description should be empty");
 }
 
+
+function testCreateMenuItemWithNullInput(){
+    const exampleItem = {  
+        id : null,
+        name : null,
+        price : null,
+        allergen : null,
+        description : null,
+        image : null 
+    };
+    const menuItem = new MenuItem(exampleItem);
+    
+    assert.strictEqual(menuItem.id, null, "id should be null");
+    assert.strictEqual(menuItem.name, "", "name should be empty");
+    assert.strictEqual(menuItem.price, -1, "price should be -1");
+    assert.strictEqual(menuItem.allergen, "", "allergen should be empty");
+    assert.strictEqual(menuItem.description, "", "description should be empty");
+}
+
+
 function testCreateOrder(){
     const exampleOrder = {  
         id : 1,
@@ -57,6 +77,32 @@ function testCreateOrder(){
 function testCreateEmptyOrder(){
     const order = new Order({});
     
+    assert.strictEqual(order.id, null, "id should be null");
+    assert.strictEqual(order.accountId, null, "accountId should be null");
+    assert.strictEqual(order.orderTime,  "", "orderTime should be empty");
+    assert.strictEqual(order.pickupLocation, -1, "pickupLocation should equal -1");
+    assert.strictEqual(order.items.length, 0, "items should be empty");
+    assert.strictEqual(order.costOfItems, -1, "costOfItems should equal -1");
+    assert.strictEqual(order.tip, -1, "tip should equal -1");
+    assert.strictEqual(order.completed, "", "completed should be empty");
+}
+
+
+function testCreateOrderWithNullInput(){
+    const exampleOrder = {  
+        id : null,
+        accountId : null,
+        orderTime : null,
+        pickupLocation : null,
+        items : null,
+        costOfItems : null,
+        tip : null,
+        completed : null,
+    };
+    const order = new Order(exampleOrder);
+    
+    assert.strictEqual(order.id, null, "id should be null");
+    assert.strictEqual(order.accountId, null, "accountId should be null");
     assert.strictEqual(order.orderTime,  "", "orderTime should be empty");
     assert.strictEqual(order.pickupLocation, -1, "pickupLocation should equal -1");
     assert.strictEqual(order.items.length, 0, "items should be empty");
@@ -90,6 +136,7 @@ function testCreateAccount(){
 function testCreateEmptyAccount(){
     const account = new Account({});
     
+    assert.strictEqual(account.id, null, "id should be null");
     assert.strictEqual(account.name, "", "name should be empty");
     assert.strictEqual(account.email, "", "email should be empty");
     assert.strictEqual(account.phone, "", "phone should be empty");
@@ -97,6 +144,28 @@ function testCreateEmptyAccount(){
     assert.strictEqual(account.cart.length, 0, "cart should be empty");
 
 }
+
+
+function testCreateAccountWithNullInput(){
+    const exampleAccount = {  
+        id : null,
+        name : null,
+        email : null,
+        phone : null,
+        accessLevel : null, 
+        cart : null
+    };
+    const account = new Account(exampleAccount);
+    
+    assert.strictEqual(account.id, null, "id should be null");
+    assert.strictEqual(account.name, "", "name should be empty");
+    assert.strictEqual(account.email, "", "email should be empty");
+    assert.strictEqual(account.phone, "", "phone should be empty");
+    assert.strictEqual(account.accessLevel, -1, "accessLevel should equal -1");
+    assert.strictEqual(account.cart.length, 0, "cart should be empty");
+
+}
+
 
 function testCreatePickupLocation(){
     const exampleLocation = {  
@@ -124,6 +193,23 @@ function testCreateEmptyPickupLocation(){
 }
 
 
+function testCreatePickupLocationWithNullInput(){
+    const exampleLocation = {  
+        id : null,
+        address : null,
+        contactInfo : null,
+        name : null
+    };
+    const location = new PickupLocation(exampleLocation);
+    
+    assert.strictEqual(location.id, null, "id should be null");
+    assert.strictEqual(location.address, "", "address should be empty");
+    assert.strictEqual(location.contactInfo, "", "contactInfo should be empty");
+    assert.strictEqual(location.name, "", "name should be empty");
+
+}
+
+
 function runTests(){
     testCreateMenuItem();
     testCreateOrder();
@@ -133,6 +219,10 @@ function runTests(){
     testCreateEmptyOrder();
     testCreateEmptyAccount();
     testCreateEmptyPickupLocation();
+    testCreateMenuItemWithNullInput();
+    testCreateOrderWithNullInput();
+    testCreateAccountWithNullInput();
+    testCreatePickupLocationWithNullInput();
     console.log("tests passed");
 }
 
