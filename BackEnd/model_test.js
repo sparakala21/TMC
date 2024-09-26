@@ -7,7 +7,7 @@ function testCreateMenuItem(){
         id : 1,
         name : "example",
         price : 23.4,
-        allergen : "vegitarian",
+        allergen : "vegetarian",
         description : "leaves",
         image : "www.example.com" 
     };
