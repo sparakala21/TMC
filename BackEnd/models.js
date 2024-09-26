@@ -1,11 +1,11 @@
-class MenuItem{
+export class MenuItem{
     constructor(data) {
-        this.id = data.id;
-        this.name = data.name;
-        this.price = data.price;
-        this.allergen = data.allergen;
-        this.description = data.description;
-        this.image = data.image;
+        this.id = data.id || null;
+        this.name = data.name || "";
+        this.price = data.price || -1;
+        this.allergen = data.allergen || "";
+        this.description = data.description || "";
+        this.image = data.image || "";
     }
 
     convertToDict(){
@@ -17,16 +17,16 @@ class MenuItem{
 }
 
 
-class Order{
+export class Order{
     constructor(data) {
-        this.id = data.id;
-        this.accountId = data.accountId;
-        this.orderTime = data.orderTime;
-        this.pickupLocation = data.pickupLocation;
-        this.items = data.items;
-        this.costOfItems = data.costOfItems;
-        this.tip = data.tip;
-        this.completed = data.completed;
+        this.id = data.id || null;
+        this.accountId = data.accountId || null;
+        this.orderTime = data.orderTime || "";
+        this.pickupLocation = data.pickupLocation || -1;
+        this.items = data.items || [];
+        this.costOfItems = data.costOfItems || -1;
+        this.tip = data.tip || -1;
+        this.completed = data.completed || "";
     }
 
     getTotalCost() {
@@ -42,14 +42,14 @@ class Order{
 }
 
 
-class Account{
+export class Account{
     constructor(data) {
-        this.id = data.id;
-        this.name = data.name;
-        this.email = data.email;
-        this.phone = data.phone;
-        this.accessLevel = data.accessLevel;
-        this.cart = data.cart;
+        this.id = data.id || null;
+        this.name = data.name || "";
+        this.email = data.email || "";
+        this.phone = data.phone || "";
+        this.accessLevel = data.accessLevel || -1;
+        this.cart = data.cart || [];
     }
 
     convertToDict() {
@@ -61,12 +61,12 @@ class Account{
 }
 
 
-class PickupLocation{
+export class PickupLocation{
     constructor(data) {
-        this.id = data.id;
-        this.address = data.address;
-        this.contactInfo = data.contactInfo;
-        this.name = data.name;
+        this.id = data.id || null;
+        this.address = data.address || "";
+        this.contactInfo = data.contactInfo || "";
+        this.name = data.name || "";
     }
 
     convertToDict() {
