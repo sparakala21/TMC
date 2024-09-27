@@ -11,33 +11,30 @@ export default function HomeScreen() {
       headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
       headerImage={
         <Image
-          source={require('@/assets/images/icon.png')}
+          source={require('@/assets/images/TMC_Logo.png')}
           style={styles.restaurantLogo}
         />
       }>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome to Thunder Mountain Curry!</ThemedText>
-        <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Our Story</ThemedText>
         <ThemedText>
-          At Thunder Mountain Curry, we bring you the bold and spicy flavors of authentic curries,
-          freshly prepared with the finest ingredients.
+          From our beginnings out of a hot dog cart to the RPI Student Union, the Troy Waterfront Farmer's Market, and our Pandemic Pop-Ups, TMC has never wavered from our mission - to bring the Troy, NY community a mouth-watering culinary adventure straight from the streets. Our new journey takes us back to our roots as a true street food experience. Follow us on Instagram and FaceBook to see where we're serving today!
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Our Menu</ThemedText>
+        <ThemedText type="subtitle">Our Food</ThemedText>
         <ThemedText>
-          Discover a variety of mouthwatering dishes, from the fiery Thunder Chicken Curry to the
-          mellow Mountain Coconut Veggie Stew.
+          Thunder Mountain Curry focuses on quality ingredients and authentic Pan-Asian recipes with our own twist.  
+          TMC is a unique street food experience for those seeking a delicious and satisfying culinary adventure.
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Visit Us</ThemedText>
         <ThemedText>
-          We're located in the heart of downtown, offering a cozy atmosphere to enjoy your meal.
-          Drop by or order online for the ultimate curry experience!
+          Now at the Troy Waterfront Farmers Market and in front of the RPI Student Union - follow us to find out when!
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
@@ -58,7 +55,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   restaurantLogo: {
-    height: 200,
+    height: 500,
     width: 300,
     bottom: 0,
     left: 0,
