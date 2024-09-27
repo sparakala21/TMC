@@ -5,6 +5,10 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native'; // or TouchableOpacity if using React Native Web
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -24,9 +28,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="menu"
         options={{
-          title: 'Explore',
+          title: 'Menu',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
