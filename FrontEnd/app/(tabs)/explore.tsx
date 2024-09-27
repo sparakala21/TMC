@@ -10,8 +10,8 @@ export default function MenuScreen() {
       headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
       headerImage={
         <Image
-          source={require('@/assets/images/icon.png')}
-          style={styles.menuLogo}
+          source={require('@/assets/images/Trans_TMC_Logo.png')}
+          style={styles.restaurantLogo}
         />
       }>
       <ThemedView style={styles.titleContainer}>
@@ -92,6 +92,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
     paddingHorizontal: 16,
+  },
+  restaurantLogo: {
+    height: 200, 
+    width: '100%', 
+    resizeMode: 'contain',
+    marginTop: 20,
+    marginBottom: 20, 
   },
   sectionContainer: {
     marginBottom: 20,
