@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - automatedTesting
   pull_request:
     types: [opened, reopened]
 
@@ -12,6 +13,14 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+
       - run: node BackEnd/model_test.js
