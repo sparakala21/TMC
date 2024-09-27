@@ -55,10 +55,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   restaurantLogo: {
-    height: 500,
-    width: 300,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    height: 200, 
+    width: '100%', 
+    resizeMode: 'contain',
+    marginBottom: 20, 
   },
 });
