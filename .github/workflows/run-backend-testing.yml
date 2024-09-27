@@ -1,8 +1,13 @@
 name: Run Backend Tests
 run-name: ${{github.actor}} is testing the backend
 on:
+  push:
+    branches:
+      - main
+      - develop
   pull_request:
     types: [opened, reopened]
+
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
