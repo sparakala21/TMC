@@ -16,8 +16,9 @@ class TableObject{
 }
 
 
-export class MenuItem extends TableObject{
+class MenuItem extends TableObject{
     constructor(data) {
+        super(data)
         this.id = data.id || null;
         this.name = data.name || "";
         this.price = data.price || -1;
@@ -39,8 +40,9 @@ export class MenuItem extends TableObject{
 }
 
 
-export class Order extends TableObject{
+class Order extends TableObject{
     constructor(data) {
+        super(data)
         this.id = data.id || null;
         this.accountId = data.accountId || null;
         this.orderTime = data.orderTime || "";
@@ -68,8 +70,9 @@ export class Order extends TableObject{
 }
 
 
-export class Account extends TableObject{
+class Account extends TableObject{
     constructor(data) {
+        super(data)
         this.id = data.id || null;
         this.name = data.name || "";
         this.email = data.email || "";
@@ -87,8 +90,9 @@ export class Account extends TableObject{
 }
 
 
-export class PickupLocation extends TableObject{
+class PickupLocation extends TableObject{
     constructor(data) {
+        super(data)
         this.id = data.id || null;
         this.address = data.address || "";
         this.contactInfo = data.contactInfo || "";
@@ -98,4 +102,12 @@ export class PickupLocation extends TableObject{
     convertToDict() {
         return {id : this.id, address : this.address, contactInfo : this.contactInfo, name : this.name}
     }
+}
+
+
+module.exports = {
+    MenuItem,
+    Order,
+    Account,
+    PickupLocation
 }

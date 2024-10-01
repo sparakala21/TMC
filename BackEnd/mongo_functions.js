@@ -1,9 +1,14 @@
-import { MenuItem, Order, Account, PickupLocation } from './models.js';
+//import { MenuItem, Order, Account, PickupLocation } from './models.js';
+const { MenuItem, Order, Account, PickupLocation } = require("./models.js")
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
+require('dotenv').config();
 
 // TODO set up secrets for connection string
-const uri = "<connection string>";
+
+const uri = process.env.ATLAS_URI
+
+console.log("uri: ",uri)
 
 const client = new MongoClient(uri,  {
     serverApi: {
@@ -15,9 +20,9 @@ const client = new MongoClient(uri,  {
 );
 
 // get to mongo connection
-const myDB = client.db("TMC");
-const menuItems = myDB.collection("MenuItems");
-const orders = myDB.collection("Orders");
+const myDB = client.db("tmc_data");
+const menuItems = myDB.collection("menuItems");
+const orders = myDB.collection("orders");
 
 const express = require('express');
 const app = express();
@@ -28,6 +33,13 @@ async function postMenuItem(newMenuItem){
     console.log(
         `menuItem inserted with the _id: ${result.insertedId}`,
     );
+    return result.insertedId
+}
+
+async function getAllMenuItems(){
+    const result = await menuItems.find({}).toArray();
+    console.log("all menu items: ", result)
+    return result   
 }
 
 
@@ -47,11 +59,29 @@ app.post('/menuItem', async (req, res) => {
 });
 
 
+app.get('/menuItems', async (req, res) => {
+    try {
+        const menuItems = await getAllMenuItems();
+        res.status(201).json({ message: 'Menu items grabbed', menuItems });
+        return menuItems;
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get menu items' });
+    }
+});
+
+
 async function postOrder(newOrder){
     const result = await orders.insertOne(newOrder.getPostDict());
     console.log(
         `order inserted with the _id: ${result.insertedId}`,
     );
+}
+
+
+async function getAllOrders(){
+    const result = await orders.find({}).toArray();
+    console.log("all orders items: ", result)
+    return result   
 }
 
 
@@ -69,3 +99,22 @@ app.post('/order', async (req, res) => {
         res.status(500).json({ error: 'Failed to add order' });
     }
 });
+
+
+app.get('/orders', async (req, res) => {
+    try {
+        const orders = await getAllOrders();
+        res.status(201).json({ message: 'orders grabbed', orders });
+        return menuItems;
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get orders' });
+    }
+});
+
+
+module.exports = {
+    postMenuItem,
+    getAllMenuItems,
+    postOrder,
+    getAllOrders
+}
