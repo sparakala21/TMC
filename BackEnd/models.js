@@ -1,11 +1,34 @@
-export class MenuItem{
+class TableObject{
     constructor(data) {
+        this.id = data.id || null
+    }
+
+    convertToDict(){
+        return {id : this.id}
+    }
+
+    getPostDict(){
+        const postDict = this.convertToDict()
+        // we dont want to post ids to the database
+        delete postDict.id
+        return postDict
+    }
+}
+
+
+class MenuItem extends TableObject{
+    constructor(data) {
+        super(data)
         this.id = data.id || null;
         this.name = data.name || "";
         this.price = data.price || -1;
         this.allergen = data.allergen || "";
         this.description = data.description || "";
         this.image = data.image || "";
+    }
+
+    hasRequiredPostFields(){
+        return this.name != "" && this.price != -1 && this.description != ""
     }
 
     convertToDict(){
@@ -17,8 +40,9 @@ export class MenuItem{
 }
 
 
-export class Order{
+class Order extends TableObject{
     constructor(data) {
+        super(data)
         this.id = data.id || null;
         this.accountId = data.accountId || null;
         this.orderTime = data.orderTime || "";
@@ -33,6 +57,10 @@ export class Order{
         return this.tip + this.costOfItems;
     }
 
+    hasRequiredPostFields(){
+        return this.accountId != null && this.pickupLocation != -1 && this.costOfItems != -1 && this.items.length != 0
+    }
+
     convertToDict() {
         return {
             id : this.id, accountId : this.accountId, orderTime : this.orderTime, pickupLocation : this.pickupLocation,
@@ -42,14 +70,19 @@ export class Order{
 }
 
 
-export class Account{
+class Account extends TableObject{
     constructor(data) {
+        super(data)
         this.id = data.id || null;
         this.name = data.name || "";
         this.email = data.email || "";
         this.phone = data.phone || "";
         this.accessLevel = data.accessLevel || -1;
         this.cart = data.cart || [];
+    }
+
+    hasRequiredPostFields(){
+        return this.name != "" && this.email != ""
     }
 
     convertToDict() {
@@ -61,8 +94,9 @@ export class Account{
 }
 
 
-export class PickupLocation{
+class PickupLocation extends TableObject{
     constructor(data) {
+        super(data)
         this.id = data.id || null;
         this.address = data.address || "";
         this.contactInfo = data.contactInfo || "";
@@ -72,4 +106,12 @@ export class PickupLocation{
     convertToDict() {
         return {id : this.id, address : this.address, contactInfo : this.contactInfo, name : this.name}
     }
+}
+
+
+module.exports = {
+    MenuItem,
+    Order,
+    Account,
+    PickupLocation
 }
