@@ -1,27 +1,55 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, Alert, Modal, StyleSheet, useColorScheme } from 'react-native';
+import { View, Text, TextInput, Button, Alert, Modal, StyleSheet, useColorScheme, Image  } from 'react-native';
+import CheckBox from '@react-native-community/checkbox';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 
-// Example menu data
-const initialMenuItems = [
-  { id: '1', name: 'Burger', price: '5.99' },
-  { id: '2', name: 'Pizza', price: '8.99' },
-  { id: '3', name: 'Pasta', price: '7.99' },
-];
+const isAdmin = true;
 
 const AdminPage = () => {
-  const [menuItems, setMenuItems] = useState(initialMenuItems); // Menu items state
-  const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
-  const [currentItem, setCurrentItem] = useState(null); // Current item being edited
+
+  // Render "Not Allowed" message if the user is not an admin
+  if (!isAdmin) {
+    return (
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
+        headerImage={
+            <Image
+                source={require('@/assets/images/Trans_TMC_Logo.png')}
+                style={styles.restaurantLogo}
+            />
+        }>
+        <Text style={styles.notAllowedText}>You are not allowed to be here.</Text>
+      </ParallaxScrollView>
+    );
+  }
+
+  const [menuModalVisible, setMenuModalVisible] = useState(false); // Modal for menu management
+  const [locationModalVisible, setLocationModalVisible] = useState(false); // Modal for location management
   const [newName, setNewName] = useState('');
   const [newPrice, setNewPrice] = useState('');
+  const [customLocation, setCustomLocation] = useState(''); // State for custom address input
 
-//   // Handle opening the edit modal
-//   const openEditModal = (item) => {
-//     setCurrentItem(item);
-//     setNewName(item.name);
-//     setNewPrice(item.price);
-//     setModalVisible(true);
-//   };
+  // Popular locations state
+  const [popularLocations, setPopularLocations] = useState({
+    'Union': false,
+    'Farmers Market': false,
+    'Freshman Hill': false,
+    '86 Field': false,
+  });
+
+  const colorScheme = useColorScheme(); 
+
+  const colors = {
+    background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
+    placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000', 
+    buttonColor: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
+    inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',  
+    inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000', 
+  };
+
+  
 
   // Handle saving the menu item
   const saveMenuItem = () => {
@@ -30,35 +58,58 @@ const AdminPage = () => {
       return;
     }
 
-    // // Update the menu items
-    // const updatedItems = menuItems.map((item) =>
-    //   item.id === currentItem.id ? { ...item, name: newName, price: newPrice } : item
-    // );
-    // setMenuItems(updatedItems);
-    // setModalVisible(false);
+    // Save logic for menu item would go here
+
+    setMenuModalVisible(false);
   };
 
+  // Handle saving the location
+  const saveLocation = () => {
+    const selectedLocations = Object.entries(popularLocations)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([location]) => location);
+  
+    if (selectedLocations.length === 0 && !customLocation) {
+      Alert.alert('Error', 'Please select a location or add a new one.');
+      return;
+    }
+  
+    // Save logic for selected locations and custom location
+    console.log('Selected Popular Locations:', selectedLocations);
+    console.log('Custom Location:', customLocation);
+  
+    setLocationModalVisible(false);
+  };
+
+  // Toggle selection of a popular location
+  const toggleLocation = (location) => {
+    setPopularLocations(prevState => ({
+      ...prevState,
+      [location]: !prevState[location],
+    }));
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Admin Panel</Text>
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
+      headerImage={
+          <Image
+              source={require('@/assets/images/Trans_TMC_Logo.png')}
+              style={styles.restaurantLogo}
+          />
+      }>
+      <ThemedText type="title">Admin Panel</ThemedText>
+    
 
-      {/* <FlatList
-        data={menuItems}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.menuItem}>
-            <Text>{item.name} - ${item.price}</Text>
-            <Button title="Edit" onPress={() => openEditModal(item)} />
-          </View>
-        )}
-      /> */}
+      {/* Buttons for Menu and Pickup Locations */}
+      <Button title="Manage Menu" onPress={() => setMenuModalVisible(true)} />
+      <Button title="Manage Pickup Locations" onPress={() => setLocationModalVisible(true)} />
 
-      {/* Modal for editing a menu item
-      <Modal visible={modalVisible} transparent={true} animationType="slide">
+      {/* Modal for managing menu items */}
+      <Modal visible={menuModalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Menu Item</Text>
+            <Text style={styles.modalTitle}>Manage Menu Item</Text>
             <TextInput
               style={styles.input}
               placeholder="Item Name"
@@ -73,11 +124,45 @@ const AdminPage = () => {
               onChangeText={setNewPrice}
             />
             <Button title="Save" onPress={saveMenuItem} />
-            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+            <Button title="Cancel" onPress={() => setMenuModalVisible(false)} />
           </View>
-        </View> */}
-      {/* </Modal> */}
-    </View>
+        </View>
+      </Modal>
+
+      {/* Modal for managing pickup locations */}
+      <Modal visible={locationModalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Manage Pickup Location</Text>
+
+            {/* Checklist for popular locations */}
+            <View style={styles.checklistContainer}>
+              {Object.keys(popularLocations).map((location) => (
+                <View key={location} style={styles.checkboxContainer}>
+                  <CheckBox
+                    value={popularLocations[location]}
+                    onValueChange={() => toggleLocation(location)}
+                  />
+                  <Text style={styles.checkboxLabel}>{location}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Input for adding a custom location */}
+            <TextInput
+              style={styles.input}
+              placeholder="Custom Location Address"
+              value={customLocation}
+              onChangeText={setCustomLocation}
+              placeholderTextColor={colors.placeholderText}
+            />
+
+            <Button title="Save" onPress={saveLocation} />
+            <Button title="Cancel" onPress={() => setLocationModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
+    </ParallaxScrollView>
   );
 };
 
@@ -93,15 +178,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    width: '100%',
   },
   input: {
     height: 50,
@@ -129,6 +205,38 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  checklistContainer: {
+    width: '100%',
+    marginBottom: 15,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 16,
+  },
+  restaurantLogo: {
+    height: 200, 
+    width: '100%', 
+    resizeMode: 'contain',
+    marginTop: 20,
+    marginBottom: 20, 
+  },
+  notAllowedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+  },
+  notAllowedText: {
+    fontSize: 100,
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    color: 'red',
   },
 });
 
