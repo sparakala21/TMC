@@ -1,20 +1,25 @@
-import { Image, StyleSheet, Platform, TouchableOpacity, Linking } from 'react-native';
+import React, { useState } from 'react';
+import { Image, StyleSheet, TouchableOpacity, Linking, Modal, View, Text, Button } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
-  
-  // Function to handle the clickable image
-  const handleInstaImagePress = () => {
-    Linking.openURL('https://www.instagram.com/thundermountaincurry/');  // Replace with your actual link
+
+  const [isCartModalVisible, setCartModalVisible] = useState(false);
+
+  // Function to handle cart button press
+  const handleCartPress = () => {
+    setCartModalVisible(true);
   };
 
-  const handleFaceBookImagePress = () => {
-    Linking.openURL('https://www.facebook.com/thundermountaincurry');  // Replace with your actual link
+  // Function to handle closing the modal
+  const closeModal = () => {
+    setCartModalVisible(false);
   };
 
   return (
+    <ThemedView style={{ flex: 1 }}>
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
       headerImage={
@@ -24,42 +29,32 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome to Thunder Mountain Curry!</ThemedText>
+        <ThemedText type="title">Order Here</ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Our Story</ThemedText>
-        <ThemedText>
-          From our beginnings out of a hot dog cart to the RPI Student Union, the Troy Waterfront Farmer's Market, and our Pandemic Pop-Ups, TMC has never wavered from our mission - to bring the Troy, NY community a mouth-watering culinary adventure straight from the streets. Our new journey takes us back to our roots as a true street food experience. Follow us on Instagram and FaceBook to see where we're serving today!
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Our Food</ThemedText>
-        <ThemedText>
-          Thunder Mountain Curry focuses on quality ingredients and authentic Pan-Asian recipes with our own twist.  
-          TMC is a unique street food experience for those seeking a delicious and satisfying culinary adventure.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Visit Us</ThemedText>
-        <ThemedText>
-          Now at the Troy Waterfront Farmers Market and in front of the RPI Student Union - follow us to find out when!
-        </ThemedText>
-        <ThemedView style={styles.imageRowContainer}>
-          <TouchableOpacity onPress={handleInstaImagePress}>
-            <Image
-              source={require('@/assets/images/Instagram_Glyph_Gradient.png')}  // Replace with your image path
-              style={styles.clickableImage}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleFaceBookImagePress}>
-            <Image
-              source={require('@/assets/images/Facebook_Logo_Primary.png')}  // Replace with your image path
-              style={styles.clickableImage}
-            />
-          </TouchableOpacity>
-        </ThemedView>
       </ThemedView>
     </ParallaxScrollView>
+
+    {/* Modal for Cart */}
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={true}
+      onRequestClose={closeModal}>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Image
+            source={require('@/assets/images/grocerybag.png')}  // Optional: Replace with an empty cart illustration if available
+            style={styles.emptyCartImage}
+          />
+          <Text style={styles.modalText}>Your Bag is Empty</Text>
+          <Text style={styles.modalSubtitle}>It's lonely in here</Text>
+          <Button title="Order Now" onPress={closeModal} />
+          <Button title="Close" onPress={closeModal} color="#ff7043" />
+        </View>
+      </View>
+    </Modal>
+    </ThemedView>
   );
 }
 
@@ -97,5 +92,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 20,
     marginVertical: 20,
+  },
+  cartButton: {
+    position: 'absolute',
+    bottom: 10,
+    right: 20,
+    backgroundColor: '#ff7043',
+    padding: 10,
+    borderRadius: 50,
+  },
+  cartIcon: {
+    height: 40,
+    width: 40,
+    resizeMode: 'contain',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    width: '80%',
+  },
+  emptyCartImage: {
+    height: 100,
+    width: 100,
+    marginBottom: 20,
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 20,
   },
 });
