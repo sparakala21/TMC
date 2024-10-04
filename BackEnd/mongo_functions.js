@@ -8,8 +8,6 @@ require('dotenv').config();
 
 const uri = process.env.ATLAS_URI
 
-console.log("uri: ",uri)
-
 const client = new MongoClient(uri,  {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -20,7 +18,8 @@ const client = new MongoClient(uri,  {
 );
 
 // get to mongo connection
-const myDB = client.db("tmc_data");
+const database = process.env.DATABASE
+const myDB = client.db(database);
 const menuItems = myDB.collection("menuItems");
 const orders = myDB.collection("orders");
 const accounts = myDB.collection("accounts");
