@@ -10,7 +10,7 @@ This guide will walk you through setting up WSL, installing Git, cloning the Thu
 
 
 
-## 3. Cloning the TMC Repository
+## 1. Cloning the TMC Repository
 
 Now that Git is installed, you can clone the TMC repository from GitHub.
 
