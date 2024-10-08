@@ -1,6 +1,6 @@
 
-const { MenuItem, Order, Account, PickupLocation } = require("./models.js");
-const assert = require("assert");
+import { MenuItem, Order, Account, PickupLocation } from './models.js';
+import assert from 'assert';
 
 function testCreateMenuItem(){
     const exampleItem = {  
