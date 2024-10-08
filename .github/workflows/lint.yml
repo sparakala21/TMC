@@ -23,8 +23,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18" # specify the Node.js version compatible with Expo
+          node-version: "20.18" # specify the Node.js version compatible with Expo
 
+      - name: Linting Frontend
+        run: cd FrontEnd
       # Install dependencies
       - name: Install dependencies
         run: npm install
