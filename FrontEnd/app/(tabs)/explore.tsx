@@ -4,6 +4,8 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
+// Once backend is finished, add to cart should send itemNames array to backend to add to said person's account
+
 // MenuItem component to display each item with quantity controls
 const MenuItem = ({ itemName, itemTitle, itemDescription, itemPrice, onQuantityChange, quantities }) => (
   <ThemedView style={styles.itemContainer}>
@@ -39,10 +41,12 @@ export default function MenuScreen() {
     gulabJamun: 0,
   });
 
+// Array to hold the cart items
+const [selectedItems, setSelectedItems] = useState([]);
+
 const Divider = () => (
   <View style={styles.divider} />
 );
-
 
 const handleQuantityChange = (item, change) => {
   setQuantities((prev) => {
@@ -50,6 +54,16 @@ const handleQuantityChange = (item, change) => {
       ...prev,
       [item]: Math.max(0, prev[item] + change),
     };
+    // Test to see the items added to cart (uses variable itemName)
+    const updatedSelectedItems = [];
+      for (const [key, value] of Object.entries(newQuantities)) {
+        for (let i = 0; i < value; i++) {
+          updatedSelectedItems.push(key);
+        }
+      }
+
+    setSelectedItems(updatedSelectedItems);
+
     return newQuantities;
   });
 };
@@ -64,6 +78,8 @@ const handleQuantityChange = (item, change) => {
     mangoLassi: 0,
     gulabJamun: 0,
   });
+
+  setSelectedItems([]);
 };
 
   const hasItemsInCart = Object.values(quantities).some(q => q > 0);
@@ -83,6 +99,12 @@ const handleQuantityChange = (item, change) => {
         </ThemedView>
 
         <Divider />
+
+        {/* Visuals for the testing labeled Selected Items */}
+        <ThemedView style={styles.selectedItemsContainer}>
+        <ThemedText type="subtitle">Selected Items:</ThemedText>
+        <ThemedText>{selectedItems.length > 0 ? selectedItems.join(', ') : 'None'}</ThemedText>
+        </ThemedView>
 
         {/* Appetizers Section */}
         <ThemedView style={styles.sectionContainer}>
