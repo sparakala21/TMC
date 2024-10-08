@@ -2,7 +2,7 @@
   "name": "tmc",
   "version": "1.0.0",
   "description": "APP for Thunder Mountain Curry",
-  "main": "index.js",
+  "main": "FrontEnd/index.js",
   "type": "module",
   "scripts": {
     "start": "expo start",
