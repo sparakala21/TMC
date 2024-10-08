@@ -1,0 +1,42 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - automatedTesting
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  lint:
+    name: Run ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the codebase
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18" # specify the Node.js version compatible with Expo
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Run ESLint
+      - name: Run ESLint
+        run: npx eslint --ext .js,.jsx,.ts,.tsx ./ # specify file extensions as needed
+
+      # Optionally, upload ESLint results as artifacts
+      - name: Archive Lint Results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint-results
+          path: "./eslint-results" # or path to your results file
