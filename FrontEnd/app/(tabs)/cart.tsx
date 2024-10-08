@@ -1,59 +1,64 @@
-import React, { useState } from 'react';
-import { Image, StyleSheet, TouchableOpacity, Linking, Modal, View, Text, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Image, StyleSheet, Modal, View, Text, Button } from 'react-native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';  // React Navigation hook
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-export default function HomeScreen() {
-
+export default function CartScreen() {
   const [isCartModalVisible, setCartModalVisible] = useState(false);
+  const isFocused = useIsFocused();  // Detect when the Cart tab is focused
+  const navigation = useNavigation();  // Navigation hook
 
-  // Function to handle cart button press
-  const handleCartPress = () => {
-    setCartModalVisible(true);
-  };
+  // Effect to show the modal when the Cart tab is focused
+  useEffect(() => {
+    if (isFocused) {
+      setCartModalVisible(true);  // Show modal when Cart tab is focused
+    }
+  }, [isFocused]);
 
-  // Function to handle closing the modal
-  const closeModal = () => {
-    setCartModalVisible(false);
+  // Function to close the modal and navigate to the Menu page
+  const closeModalAndNavigate = () => {
+    setCartModalVisible(false);  // Close the modal
+    navigation.navigate('explore');  // Navigate to Menu screen
   };
 
   return (
     <ThemedView style={{ flex: 1 }}>
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/Trans_TMC_Logo.png')}
-          style={styles.restaurantLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Order Here</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-      </ThemedView>
-    </ParallaxScrollView>
-
-    {/* Modal for Cart */}
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={true}
-      onRequestClose={closeModal}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
+        headerImage={
           <Image
-            source={require('@/assets/images/grocerybag.png')}  // Optional: Replace with an empty cart illustration if available
-            style={styles.emptyCartImage}
+            source={require('@/assets/images/Trans_TMC_Logo.png')}
+            style={styles.restaurantLogo}
           />
-          <Text style={styles.modalText}>Your Bag is Empty</Text>
-          <Text style={styles.modalSubtitle}>It's lonely in here</Text>
-          <Button title="Order Now" onPress={closeModal} />
-          <Button title="Close" onPress={closeModal} color="#ff7043" />
+        }>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title">Order Here</ThemedText>
+        </ThemedView>
+        <ThemedView style={styles.stepContainer}>
+        </ThemedView>
+      </ParallaxScrollView>
+
+      {/* Modal for Cart */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isCartModalVisible}
+        onRequestClose={closeModalAndNavigate}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Image
+              source={require('@/assets/images/grocerybag.png')} 
+              style={styles.emptyCartImage}
+            />
+            <Text style={styles.modalText}>Your Bag is Empty</Text>
+            <Text style={styles.modalSubtitle}>It's lonely in here</Text>
+            <Button title="Order Now" onPress={closeModalAndNavigate} />
+            <Button title="Close" onPress={closeModalAndNavigate} color="#ff7043" />
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
     </ThemedView>
   );
 }
@@ -77,34 +82,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginTop: 20,
     marginBottom: 20, 
-  },
-  clickableImageContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  clickableImage: {
-    height: 50,
-    width: 50,
-    resizeMode: 'contain',
-  },
-  imageRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginVertical: 20,
-  },
-  cartButton: {
-    position: 'absolute',
-    bottom: 10,
-    right: 20,
-    backgroundColor: '#ff7043',
-    padding: 10,
-    borderRadius: 50,
-  },
-  cartIcon: {
-    height: 40,
-    width: 40,
-    resizeMode: 'contain',
   },
   modalContainer: {
     flex: 1,
