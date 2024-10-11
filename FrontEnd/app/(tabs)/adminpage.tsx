@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, Modal, StyleSheet, useColorScheme, Image  } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
+import { View, Text, TextInput, Button, Alert, Modal, StyleSheet, useColorScheme, Image, CheckBox  } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
