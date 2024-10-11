@@ -1,6 +1,6 @@
 //import { MenuItem, Order, Account, PickupLocation } from './models.js';
 const { MenuItem, Order, Account, PickupLocation } = require("./models.js")
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId  } = require("mongodb");
 
 require('dotenv').config();
 
@@ -27,8 +27,8 @@ const pickupLocations = myDB.collection("pickupLocations");
 
 const express = require('express');
 const app = express();
+app.use(express.json());
 
-// TODO: add image field
 async function postMenuItem(newMenuItem){
     const result = await menuItems.insertOne(newMenuItem.getPostDict());
     console.log(
@@ -43,6 +43,12 @@ async function getAllMenuItems(query={}){
     return result   
 }
 
+async function updateMenuItem(filter, updateDoc){
+    const result = await menuItems.updateOne(filter, updateDoc);
+    console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
+    return result
+}
+
 
 app.post('/menuItem', async (req, res) => {
     const newMenuItem = new MenuItem(req.body);
@@ -54,6 +60,7 @@ app.post('/menuItem', async (req, res) => {
     try {
         const menuItem = await postMenuItem(newMenuItem);
         res.status(201).json({ message: 'Menu item added successfully', menuItem });
+        return menuItem
     } catch (error) {
         res.status(500).json({ error: 'Failed to add menu item' });
     }
@@ -61,13 +68,28 @@ app.post('/menuItem', async (req, res) => {
 
 
 app.get('/menuItems', async (req, res) => {
-    const query = req.body;
+    const query = req.query;
+    if(query._id){
+        query._id = new ObjectId(query._id)
+    }
+
     try {
-        const allMenuItems = await getAllMenuItems(query);
-        res.status(201).json({ message: 'Menu items grabbed', allMenuItems });
-        return allMenuItems;
+        const foundMenuItems = await getAllMenuItems(query);
+        res.status(201).json({ message: 'Menu items grabbed', foundMenuItems });
+        return foundMenuItems;
     } catch (error) {
         res.status(500).json({ error: 'Failed to get menu items' });
+    }
+});
+
+
+app.put('/menuItem', async (req, res) => {
+    const { filter, updateDoc } = req.body;
+    try {
+        const result = await updateMenuItem(filter, updateDoc);
+        res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update menu item' });
     }
 });
 
@@ -84,6 +106,13 @@ async function getOrders(query={}){
     const result = await orders.find(query).toArray();
     console.log("all orders items: ", result);
     return result;
+}
+
+
+async function updateOrder(filter, updateDoc){
+    const result = await orders.updateOne(filter, updateDoc);
+    console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
+    return result
 }
 
 
@@ -104,7 +133,10 @@ app.post('/order', async (req, res) => {
 
 
 app.get('/orders', async (req, res) => {
-    const query = req.body;
+    const query = req.query;
+    if(query._id){
+        query._id = new ObjectId(query._id)
+    }
     try {
         const foundOrders = await getOrders(query);
         res.status(201).json({ message: 'orders grabbed', foundOrders });
@@ -114,6 +146,16 @@ app.get('/orders', async (req, res) => {
     }
 });
 
+
+app.put('/order', async (req, res) => {
+    const { filter, updateDoc } = req.body;
+    try {
+        const result = await updateOrder(filter, updateDoc);
+        res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update order' });
+    }
+});
 
 
 async function createAccount(newAccount){
@@ -127,6 +169,13 @@ async function getAccounts(query={}){
     const result = await accounts.find(query).toArray();
     console.log("all accounts: ", result);
     return result;
+}
+
+
+async function updateAccount(filter, updateDoc){
+    const result = await accounts.updateOne(filter, updateDoc);
+    console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
+    return result
 }
 
 
@@ -147,13 +196,27 @@ app.post('/account', async (req, res) => {
 
 
 app.get('/accounts', async (req, res) => {
-    const query = req.body;
+    const query = req.query;
+    if(query._id){
+        query._id = new ObjectId(query._id)
+    }
     try {
         const foundAccounts = await getAccounts(query);
         res.status(201).json({ message: 'accounts grabbed', foundAccounts });
         return foundAccounts;
     } catch (error) {
         res.status(500).json({ error: 'Failed to get accounts' });
+    }
+});
+
+
+app.put('/account', async (req, res) => {
+    const { filter, updateDoc } = req.body;
+    try {
+        const result = await updateAccount(filter, updateDoc);
+        res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update account' });
     }
 });
 
@@ -170,6 +233,12 @@ async function getPickupLocations(query={}){
     const result = await pickupLocations.find(query).toArray();
     console.log("all pickup locations: ", result)
     return result   
+}
+
+async function updatePickupLocation(filter, updateDoc){
+    const result = await pickupLocations.updateOne(filter, updateDoc);
+    console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
+    return result
 }
 
 
@@ -190,7 +259,10 @@ app.post('/pickupLocation', async (req, res) => {
 
 
 app.get('/pickupLocations', async (req, res) => {
-    const query = req.body
+    const query = req.query;
+    if(query._id){
+        query._id = new ObjectId(query._id)
+    }
     try {
         const foundPickupLocations = await getPickupLocations(query);
         res.status(201).json({ message: 'pickup locations grabbed', foundPickupLocations });
@@ -200,9 +272,18 @@ app.get('/pickupLocations', async (req, res) => {
     }
 });
 
-module.exports = {
-    postMenuItem,
-    getAllMenuItems,
-    postOrder,
-    getOrders
-}
+
+app.put('/pickupLocation', async (req, res) => {
+    const { filter, updateDoc } = req.body;
+    try {
+        const result = await updatePickupLocation(filter, updateDoc);
+        res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update pickup location' });
+    }
+});
+
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
