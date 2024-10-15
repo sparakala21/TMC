@@ -77,18 +77,19 @@ class Account extends TableObject{
         this.name = data.name || "";
         this.email = data.email || "";
         this.phone = data.phone || "";
-        this.accessLevel = data.accessLevel || -1;
+        this.password = data.password || "";
+        this.accessLevel = data.accessLevel || -1; // 0 for users, 1 for admins
         this.cart = data.cart || [];
     }
 
     hasRequiredPostFields(){
-        return this.name != "" && this.email != ""
+        return this.name != "" && this.email != "" && this.password != ""
     }
 
     convertToDict() {
         return {
             _id : this._id, name : this.name, email : this.email, phone : this.phone, 
-            accessLevel : this.accessLevel, cart : this.cart
+            accessLevel : this.accessLevel, cart : this.cart, password: this.password 
         }
     }
 }
