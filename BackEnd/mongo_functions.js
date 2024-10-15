@@ -84,11 +84,18 @@ app.get('/menuItems', async (req, res) => {
 
 
 app.put('/menuItem', async (req, res) => {
-    const { filter, updateDoc } = req.body;
+    const updateDoc  = {$set: req.body};
+    const query = req.query
+
+    if(query._id){
+        query._id = new ObjectId(query._id)
+    }
+
     try {
-        const result = await updateMenuItem(filter, updateDoc);
+        const result = await updateMenuItem(query, updateDoc);
         res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
     } catch (error) {
+        console.log("Error: " + error)
         res.status(500).json({ error: 'Failed to update menu item' });
     }
 });
@@ -99,6 +106,7 @@ async function postOrder(newOrder){
     console.log(
         `order inserted with the _id: ${result.insertedId}`,
     );
+    return result.insertedId
 }
 
 
@@ -119,13 +127,14 @@ async function updateOrder(filter, updateDoc){
 app.post('/order', async (req, res) => {
     const newOrder = new Order(req.body);
 
-    if (newOrder.hasRequiredPostFields()) {
-        return res.status(400).json({ error: 'missing required fields' });
+    if (!newOrder.hasRequiredPostFields()) {
+        return res.status(400).json({ error: 'Required fields are missing' });
     }
     
     try {
         const order = await postOrder(newOrder);
         res.status(201).json({ message: 'order added successfully', order });
+        return order
     } catch (error) {
         res.status(500).json({ error: 'Failed to add order' });
     }
@@ -134,9 +143,11 @@ app.post('/order', async (req, res) => {
 
 app.get('/orders', async (req, res) => {
     const query = req.query;
+    console.log(query)
     if(query._id){
         query._id = new ObjectId(query._id)
     }
+    console.log("id handled")
     try {
         const foundOrders = await getOrders(query);
         res.status(201).json({ message: 'orders grabbed', foundOrders });
@@ -148,9 +159,15 @@ app.get('/orders', async (req, res) => {
 
 
 app.put('/order', async (req, res) => {
-    const { filter, updateDoc } = req.body;
+    const updateDoc  = {$set: req.body};
+    const query = req.query
+
+    if(query._id){
+        query._id = new ObjectId(query._id)
+    }
+    
     try {
-        const result = await updateOrder(filter, updateDoc);
+        const result = await updateOrder(query, updateDoc);
         res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update order' });
@@ -163,6 +180,7 @@ async function createAccount(newAccount){
     console.log(
         `account inserted with the _id: ${result.insertedId}`,
     );
+    return result.insertedId
 }
 
 async function getAccounts(query={}){
@@ -182,13 +200,14 @@ async function updateAccount(filter, updateDoc){
 app.post('/account', async (req, res) => {
     const newAccount = new Account(req.body);
 
-    if (newAccount.hasRequiredPostFields()) {
-        return res.status(400).json({ error: 'missing required fields' });
+    if (!newAccount.hasRequiredPostFields()) {
+        return res.status(400).json({ error: 'Required fields are missing' });
     }
     
     try {
         const account = await createAccount(newAccount);
         res.status(201).json({ message: 'account successfully created', account });
+        return account
     } catch (error) {
         res.status(500).json({ error: 'Failed to create account' });
     }
@@ -211,9 +230,15 @@ app.get('/accounts', async (req, res) => {
 
 
 app.put('/account', async (req, res) => {
-    const { filter, updateDoc } = req.body;
+    const updateDoc  = {$set: req.body};
+    const query = req.query
+
+    if(query._id){
+        query._id = new ObjectId(query._id)
+    }
+
     try {
-        const result = await updateAccount(filter, updateDoc);
+        const result = await updateAccount(query, updateDoc);
         res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update account' });
@@ -226,6 +251,7 @@ async function createPickupLocation(newPickupLocation){
     console.log(
         `pickup location inserted with the _id: ${result.insertedId}`,
     );
+    return result.insertedId
 }
 
 
@@ -245,13 +271,14 @@ async function updatePickupLocation(filter, updateDoc){
 app.post('/pickupLocation', async (req, res) => {
     const newPickupLocation = new PickupLocation(req.body)
 
-    if (newPickupLocation.hasRequiredPostFields()) {
-        return res.status(400).json({ error: 'missing required fields' });
+    if (!newPickupLocation.hasRequiredPostFields()) {
+        return res.status(400).json({ error: 'Required fields are missing' });
     }
     
     try {
         const pickupLocation = await createPickupLocation(newPickupLocation);
         res.status(201).json({ message: 'pickup location successfully created', pickupLocation });
+        return pickupLocation
     } catch (error) {
         res.status(500).json({ error: 'Failed to create pickup location' });
     }
@@ -274,9 +301,15 @@ app.get('/pickupLocations', async (req, res) => {
 
 
 app.put('/pickupLocation', async (req, res) => {
-    const { filter, updateDoc } = req.body;
+    const updateDoc  = {$set: req.body};
+    const query = req.query
+
+    if(query._id){
+        query._id = new ObjectId(query._id)
+    }
+
     try {
-        const result = await updatePickupLocation(filter, updateDoc);
+        const result = await updatePickupLocation(query, updateDoc);
         res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update pickup location' });
