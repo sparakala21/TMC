@@ -35,3 +35,18 @@ After cloning, navigate into the project directory:
 ```bash
 cd TMC
 ```
+
+
+
+# Running the Backend tests
+
+## 1. Model Tests
+
+run the command ```node.model_test.js``` from the BackEnd folder
+
+## 2. MongoFunction Tests
+
+Make sure you have the .env file with ```ATLAS_URI``` set and also have ```DATABASE = 'tmc_uat'``` 
+Note: the database must be set to 'tmc_uat' in order to run the test
+
+In the BackEnd folder run ```node mongo_functions.js``` to start the server. Then from another terminal run ```node mongo_test_functions.js ```
