@@ -3,8 +3,18 @@ import { Image, StyleSheet, View, TouchableOpacity } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useIsFocused, useNavigation } from '@react-navigation/native'
 
 // Once backend is finished, add to cart should send itemNames array to backend to add to said person's account
+
+const priceLookup = {
+        samosa: 5.99,
+        pakoras: 6.99,
+        chickenCurry: 14.99,
+        veggieStew: 13.99,
+        mangoLassi: 4.99,
+        gulabJamun: 5.49,
+      };
 
 // MenuItem component to display each item with quantity controls
 const MenuItem = ({ itemName, itemTitle, itemDescription, itemPrice, onQuantityChange, quantities }) => (
@@ -41,21 +51,43 @@ export default function MenuScreen() {
     gulabJamun: 0,
   });
 
-const Sidebar = ({ selectedItems, onClose }) => (
-  <ThemedView style={styles.sidebarContainer}>
-    <ThemedText type="subtitle" style={styles.sidebarTitle}>Your Cart</ThemedText>
-    {selectedItems.length > 0 ? (
-      selectedItems.map((item, index) => (
-        <ThemedText key={index}>{item}</ThemedText>
-      ))
-    ) : (
-      <ThemedText>No items in the cart.</ThemedText>
-    )}
-    <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-      <ThemedText style={styles.closeButtonText}>X</ThemedText>
-    </TouchableOpacity>
-  </ThemedView>
-);
+const Sidebar = ({ selectedItems, onClose }) => {
+  const navigation = useNavigation();
+
+  const closeAndNavigate = () => {
+    onClose();
+    navigation.navigate('cart');
+  };
+
+  // Variables to calculate
+  const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const tax = subtotal * 0.08875;
+  const total = subtotal + tax;
+
+  return (
+    <ThemedView style={styles.sidebarContainer}>
+      <ThemedText type="subtitle" style={styles.sidebarTitle}>Your Cart</ThemedText>
+      {selectedItems.length > 0 ? (
+        selectedItems.map((item, index) => (
+          <ThemedText key={index}>{item}</ThemedText>
+        ))
+      ) : (
+        <ThemedText>No items in the cart.</ThemedText>
+      )}
+      <ThemedText>Subtotal: ${subtotal.toFixed(2)}</ThemedText>
+      <ThemedText>Tax: ${tax.toFixed(2)}</ThemedText>
+      <ThemedText type="defaultSemiBold">Total: ${total.toFixed(2)}</ThemedText>
+
+      <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+        <ThemedText style={styles.closeButtonText}>X</ThemedText>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={closeAndNavigate} style={styles.navigateButton}>
+        <ThemedText style={styles.navigateText}>Checkout</ThemedText>
+      </TouchableOpacity> 
+    </ThemedView>
+  );
+};
 
 
 // Array to hold the cart items
@@ -100,7 +132,7 @@ const handleAddToCart = () => {
       if (existingItemIndex >= 0) {
         updatedCart[existingItemIndex].quantity += qty;
       } else {
-        updatedCart.push({ name: item, quantity: qty });
+        updatedCart.push({ name: item, quantity: qty, price: priceLookup[item] });
       }
     }
   }
@@ -343,5 +375,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#e5dccf',
   },
+  navigateButton: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 15,
+    backgroundColor: '#F54302',
+    alignItems: 'center',
+  },
+  navigateText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#e5dccf',
+  }
 
 });
