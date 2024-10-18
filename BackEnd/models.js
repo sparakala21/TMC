@@ -1,16 +1,16 @@
 class TableObject{
     constructor(data) {
-        this.id = data.id || null
+        this._id = data._id || null
     }
 
     convertToDict(){
-        return {id : this.id}
+        return {_id : this._id}
     }
 
     getPostDict(){
         const postDict = this.convertToDict()
         // we dont want to post ids to the database
-        delete postDict.id
+        delete postDict._id
         return postDict
     }
 }
@@ -19,7 +19,7 @@ class TableObject{
 class MenuItem extends TableObject{
     constructor(data) {
         super(data)
-        this.id = data.id || null;
+        this._id = data._id || null;
         this.name = data.name || "";
         this.price = data.price || -1;
         this.allergen = data.allergen || "";
@@ -33,7 +33,7 @@ class MenuItem extends TableObject{
 
     convertToDict(){
         return {
-            id : this.id, name : this.name, price : this.price, allergen : this.allergen, 
+            _id : this._id, name : this.name, price : this.price, allergen : this.allergen, 
             description : this.description, image : this.image
         }
     }
@@ -43,7 +43,7 @@ class MenuItem extends TableObject{
 class Order extends TableObject{
     constructor(data) {
         super(data)
-        this.id = data.id || null;
+        this._id = data._id || null;
         this.accountId = data.accountId || null;
         this.orderTime = data.orderTime || "";
         this.pickupLocation = data.pickupLocation || -1;
@@ -63,7 +63,7 @@ class Order extends TableObject{
 
     convertToDict() {
         return {
-            id : this.id, accountId : this.accountId, orderTime : this.orderTime, pickupLocation : this.pickupLocation,
+            _id : this._id, accountId : this.accountId, orderTime : this.orderTime, pickupLocation : this.pickupLocation,
             items : this.items, costOfItems : this.costOfItems, tip : this.tip, completed : this.completed
         }
     }
@@ -73,22 +73,23 @@ class Order extends TableObject{
 class Account extends TableObject{
     constructor(data) {
         super(data)
-        this.id = data.id || null;
+        this._id = data._id || null;
         this.name = data.name || "";
         this.email = data.email || "";
         this.phone = data.phone || "";
-        this.accessLevel = data.accessLevel || -1;
+        this.password = data.password || "";
+        this.accessLevel = data.accessLevel || -1; // 0 for users, 1 for admins
         this.cart = data.cart || [];
     }
 
     hasRequiredPostFields(){
-        return this.name != "" && this.email != ""
+        return this.name != "" && this.email != "" && this.password != ""
     }
 
     convertToDict() {
         return {
-            id : this.id, name : this.name, email : this.email, phone : this.phone, 
-            accessLevel : this.accessLevel, cart : this.cart
+            _id : this._id, name : this.name, email : this.email, phone : this.phone, 
+            accessLevel : this.accessLevel, cart : this.cart, password: this.password 
         }
     }
 }
@@ -97,14 +98,19 @@ class Account extends TableObject{
 class PickupLocation extends TableObject{
     constructor(data) {
         super(data)
-        this.id = data.id || null;
+        this._id = data._id || null;
         this.address = data.address || "";
         this.contactInfo = data.contactInfo || "";
         this.name = data.name || "";
+        this.active = data.active || false;
+    }
+
+    hasRequiredPostFields(){
+        return this.address != "" && this.contactInfo != "" && this.name != ""
     }
 
     convertToDict() {
-        return {id : this.id, address : this.address, contactInfo : this.contactInfo, name : this.name}
+        return {_id : this._id, address : this.address, contactInfo : this.contactInfo, name : this.name, active : this.active}
     }
 }
 
