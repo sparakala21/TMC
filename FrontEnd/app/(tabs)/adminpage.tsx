@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, Modal, StyleSheet, useColorScheme, Image, CheckBox  } from 'react-native';
+import { View, Text, TextInput, Button, Alert, Modal, StyleSheet, useColorScheme, Image} from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -80,13 +80,13 @@ const AdminPage = () => {
     setLocationModalVisible(false);
   };
 
-  // Toggle selection of a popular location
-  const toggleLocation = (location) => {
-    setPopularLocations(prevState => ({
-      ...prevState,
-      [location]: !prevState[location],
-    }));
-  };
+  // // Toggle selection of a popular location
+  // const toggleLocation = (location) => {
+  //   setPopularLocations(prevState => ({
+  //     ...prevState,
+  //     [location]: !prevState[location],
+  //   }));
+  // };
 
   return (
     <ParallaxScrollView
@@ -138,10 +138,10 @@ const AdminPage = () => {
             <View style={styles.checklistContainer}>
               {Object.keys(popularLocations).map((location) => (
                 <View key={location} style={styles.checkboxContainer}>
-                  <CheckBox
+                  {/* <CheckBox
                     value={popularLocations[location]}
                     onValueChange={() => toggleLocation(location)}
-                  />
+                  /> */}
                   <Text style={styles.checkboxLabel}>{location}</Text>
                 </View>
               ))}
