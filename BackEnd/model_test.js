@@ -4,7 +4,7 @@ const assert = require("assert");
 
 function testCreateMenuItem(){
     const exampleItem = {  
-        id : 1,
+        _id : 1,
         name : "example",
         price : 23.4,
         allergen : "vegetarian",
@@ -13,7 +13,7 @@ function testCreateMenuItem(){
     };
     const menuItem = new MenuItem(exampleItem);
     
-    assert.strictEqual(menuItem.id, exampleItem.id, "id should equal exampleItem.id");
+    assert.strictEqual(menuItem._id, exampleItem._id, "id should equal exampleItem.id");
     assert.strictEqual(menuItem.name, exampleItem.name, "name should equal exampleItem.name");
     assert.strictEqual(menuItem.price, exampleItem.price, "price should equal exampleItem.price");
     assert.strictEqual(menuItem.allergen, exampleItem.allergen, "allergen should equal exampleItem.allergen");
@@ -33,7 +33,7 @@ function testCreateEmptyMenuItem(){
 
 function testCreateMenuItemWithNullInput(){
     const exampleItem = {  
-        id : null,
+        _id : null,
         name : null,
         price : null,
         allergen : null,
@@ -42,7 +42,7 @@ function testCreateMenuItemWithNullInput(){
     };
     const menuItem = new MenuItem(exampleItem);
     
-    assert.strictEqual(menuItem.id, null, "id should be null");
+    assert.strictEqual(menuItem._id, null, "id should be null");
     assert.strictEqual(menuItem.name, "", "name should be empty");
     assert.strictEqual(menuItem.price, -1, "price should be -1");
     assert.strictEqual(menuItem.allergen, "", "allergen should be empty");
@@ -52,7 +52,7 @@ function testCreateMenuItemWithNullInput(){
 
 function testCreateOrder(){
     const exampleOrder = {  
-        id : 1,
+        _id : 1,
         accountId : 2,
         orderTime : "2023-09-24T15:30:45Z",
         pickupLocation : 3,
@@ -63,7 +63,7 @@ function testCreateOrder(){
     };
     const order = new Order(exampleOrder);
     
-    assert.strictEqual(order.id, exampleOrder.id, "id should equal exampleOrder.id");
+    assert.strictEqual(order._id, exampleOrder._id, "id should equal exampleOrder.id");
     assert.strictEqual(order.accountId, exampleOrder.accountId, "accountId should equal exampleOrder.accountId");
     assert.strictEqual(order.orderTime, exampleOrder.orderTime, "orderTime should equal exampleOrder.orderTime");
     assert.strictEqual(order.pickupLocation, exampleOrder.pickupLocation, "pickupLocation should equal exampleOrder.pickupLocation");
@@ -77,7 +77,7 @@ function testCreateOrder(){
 function testCreateEmptyOrder(){
     const order = new Order({});
     
-    assert.strictEqual(order.id, null, "id should be null");
+    assert.strictEqual(order._id, null, "id should be null");
     assert.strictEqual(order.accountId, null, "accountId should be null");
     assert.strictEqual(order.orderTime,  "", "orderTime should be empty");
     assert.strictEqual(order.pickupLocation, -1, "pickupLocation should equal -1");
@@ -90,7 +90,7 @@ function testCreateEmptyOrder(){
 
 function testCreateOrderWithNullInput(){
     const exampleOrder = {  
-        id : null,
+        _id : null,
         accountId : null,
         orderTime : null,
         pickupLocation : null,
@@ -101,7 +101,7 @@ function testCreateOrderWithNullInput(){
     };
     const order = new Order(exampleOrder);
     
-    assert.strictEqual(order.id, null, "id should be null");
+    assert.strictEqual(order._id, null, "id should be null");
     assert.strictEqual(order.accountId, null, "accountId should be null");
     assert.strictEqual(order.orderTime,  "", "orderTime should be empty");
     assert.strictEqual(order.pickupLocation, -1, "pickupLocation should equal -1");
@@ -114,7 +114,7 @@ function testCreateOrderWithNullInput(){
 
 function testCreateAccount(){
     const exampleAccount = {  
-        id : 1,
+        _id : 1,
         name : "the tester",
         email : "theTester@test.com",
         phone : "122-333-4444",
@@ -123,7 +123,7 @@ function testCreateAccount(){
     };
     const account = new Account(exampleAccount);
     
-    assert.strictEqual(account.id, exampleAccount.id, "id should equal exampleAccount.id");
+    assert.strictEqual(account._id, exampleAccount._id, "id should equal exampleAccount.id");
     assert.strictEqual(account.name, exampleAccount.name, "name should equal exampleAccount.name");
     assert.strictEqual(account.email, exampleAccount.email, "email should equal exampleAccount.email");
     assert.strictEqual(account.phone, exampleAccount.phone, "phone should equal exampleAccount.phone");
@@ -136,7 +136,7 @@ function testCreateAccount(){
 function testCreateEmptyAccount(){
     const account = new Account({});
     
-    assert.strictEqual(account.id, null, "id should be null");
+    assert.strictEqual(account._id, null, "id should be null");
     assert.strictEqual(account.name, "", "name should be empty");
     assert.strictEqual(account.email, "", "email should be empty");
     assert.strictEqual(account.phone, "", "phone should be empty");
@@ -148,7 +148,7 @@ function testCreateEmptyAccount(){
 
 function testCreateAccountWithNullInput(){
     const exampleAccount = {  
-        id : null,
+        _id : null,
         name : null,
         email : null,
         phone : null,
@@ -157,7 +157,7 @@ function testCreateAccountWithNullInput(){
     };
     const account = new Account(exampleAccount);
     
-    assert.strictEqual(account.id, null, "id should be null");
+    assert.strictEqual(account._id, null, "id should be null");
     assert.strictEqual(account.name, "", "name should be empty");
     assert.strictEqual(account.email, "", "email should be empty");
     assert.strictEqual(account.phone, "", "phone should be empty");
@@ -169,14 +169,14 @@ function testCreateAccountWithNullInput(){
 
 function testCreatePickupLocation(){
     const exampleLocation = {  
-        id : 1,
+        _id : 1,
         address : "123 RPI Rd.",
         contactInfo : "123-456-7890",
         name : "RPI union"
     };
     const location = new PickupLocation(exampleLocation);
     
-    assert.strictEqual(location.id, exampleLocation.id, "id should equal exampleLocation.id");
+    assert.strictEqual(location._id, exampleLocation._id, "id should equal exampleLocation.id");
     assert.strictEqual(location.address, exampleLocation.address, "address should equal exampleLocation.address");
     assert.strictEqual(location.contactInfo, exampleLocation.contactInfo, "contactInfo should equal exampleLocation.contactInfo");
     assert.strictEqual(location.name, exampleLocation.name, "name should equal exampleLocation.name");
@@ -195,14 +195,14 @@ function testCreateEmptyPickupLocation(){
 
 function testCreatePickupLocationWithNullInput(){
     const exampleLocation = {  
-        id : null,
+        _id : null,
         address : null,
         contactInfo : null,
         name : null
     };
     const location = new PickupLocation(exampleLocation);
     
-    assert.strictEqual(location.id, null, "id should be null");
+    assert.strictEqual(location._id, null, "id should be null");
     assert.strictEqual(location.address, "", "address should be empty");
     assert.strictEqual(location.contactInfo, "", "contactInfo should be empty");
     assert.strictEqual(location.name, "", "name should be empty");

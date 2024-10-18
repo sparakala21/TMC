@@ -102,10 +102,15 @@ class PickupLocation extends TableObject{
         this.address = data.address || "";
         this.contactInfo = data.contactInfo || "";
         this.name = data.name || "";
+        this.active = data.active || false;
+    }
+
+    hasRequiredPostFields(){
+        return this.address != "" && this.contactInfo != "" && this.name != ""
     }
 
     convertToDict() {
-        return {_id : this._id, address : this.address, contactInfo : this.contactInfo, name : this.name}
+        return {_id : this._id, address : this.address, contactInfo : this.contactInfo, name : this.name, active : this.active}
     }
 }
 
