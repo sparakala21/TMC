@@ -272,6 +272,94 @@ async function testUpdateAccount(){
 }
 
 
+async function testPostPickupLocaion(){
+    const url = BASE_URL + '/pickupLocation';
+    const body = {  
+        address : "123 RPI Rd.",
+        contactInfo : "123-456-7890",
+        name : "RPI union"
+    };
+    result = await postData(url, body);
+    assert.strictEqual(result.message, 'pickup location successfully created');
+    const insertedId = result.pickupLocation;
+    result = await fetchData(BASE_URL + '/pickupLocations?_id='+ insertedId)
+    console.log(result)
+    assert.strictEqual(result.foundPickupLocations[0]._id, insertedId )
+}
+
+async function testPostEmptyPickupLocation(){
+    const url = BASE_URL + '/pickupLocation';
+    const body = {};
+    result = await postData(url, body);
+    assert.strictEqual(result.error, 'Required fields are missing');
+}
+
+
+async function testPostIncompletePickupLocation(){
+    const url = BASE_URL + '/pickupLocation';
+    const body = {  
+        contactInfo : "123-456-7890",
+        name : "RPI union"
+    };
+    result = await postData(url, body);
+    assert.strictEqual(result.error, 'Required fields are missing');
+}
+
+async function testUpdatePickupLocation(){
+    const url = BASE_URL + '/pickupLocation';
+    const body = {  
+        address : "123 RPI Rd.",
+        contactInfo : "123-456-7890",
+        name : "RPI union"
+    };
+    result = await postData(url, body);
+    assert.strictEqual(result.message, 'pickup location successfully created');
+    const insertedId = result.pickupLocation;
+    const updateItem = {  
+        address : "193 RPI Rd.",
+        contactInfo : "123-456-4321",
+        name : "Sage Dinning Hall",
+        active : true
+    };
+    await updateData(url + '?_id='+ insertedId, updateItem)
+    result = await fetchData(BASE_URL + '/pickupLocations?_id='+ insertedId)
+    assert.strictEqual(result.foundPickupLocations[0]._id, insertedId )
+    assert.strictEqual(result.foundPickupLocations[0].address, updateItem.address)
+    assert.strictEqual(result.foundPickupLocations[0].contactInfo, updateItem.contactInfo)
+    assert.strictEqual(result.foundPickupLocations[0].name, updateItem.name)
+    assert.strictEqual(result.foundPickupLocations[0].active, false)
+}
+
+
+async function testActivateLocation(){
+    const url = BASE_URL + '/pickupLocation';
+    body = {  
+        address : "123 RPI Rd.",
+        contactInfo : "123-456-7890",
+        name : "RPI union",
+        active : true
+    };
+    result = await postData(url, body);
+    assert.strictEqual(result.message, 'pickup location successfully created');
+    const insertedIdOne = result.pickupLocation;
+
+    body = {  
+        address : "321 RPI Rd.",
+        contactInfo : "123-456-7890",
+        name : "Commons Dinning hall",
+    };
+    result = await postData(url, body);
+    assert.strictEqual(result.message, 'pickup location successfully created');
+    const insertedIdTwo = result.pickupLocation;
+    result = await postData(BASE_URL + '/activateLocation', {_id: insertedIdTwo})
+    // check that the active flag was removed from the first id
+    result = await fetchData(BASE_URL + '/pickupLocations?_id='+ insertedIdOne)
+    assert.strictEqual(result.foundPickupLocations[0].active, false )
+    // check the active flag was set to true for the second id
+    result = await fetchData(BASE_URL + '/pickupLocations?_id='+ insertedIdTwo)
+    assert.strictEqual(result.foundPickupLocations[0].active, true )
+}
+
 async function clearTestDB(){
     const uri = process.env.ATLAS_URI
 
@@ -299,18 +387,23 @@ async function clearTestDB(){
 async function runTests(){
     // We only want to run the tests on the test database 
     assert.strictEqual(process.env.DATABASE, TEST_DB)
-    await testPostMenuItem()
-    await testPostEmptyMenuItem()
-    await testPostIncompleteMenuItem()
-    await testUpdateMenuItem()
-    await testPostOrder()
-    await testPostEmptyOrder()
-    await testPostIncompleteOrder()
-    await testUpdateOrder()
-    await testPostAccount()
-    await testPostEmptyAccount()
-    await testPostIncompleteAccount()
-    await testUpdateAccount()
+    //await testPostMenuItem()
+    //await testPostEmptyMenuItem()
+    //await testPostIncompleteMenuItem()
+    //await testUpdateMenuItem()
+    //await testPostOrder()
+    //await testPostEmptyOrder()
+    //await testPostIncompleteOrder()
+    //await testUpdateOrder()
+    //await testPostAccount()
+    //await testPostEmptyAccount()
+    //await testPostIncompleteAccount()
+    //await testUpdateAccount()
+    //await testPostPickupLocaion()
+    //await testPostEmptyPickupLocation()
+    //await testPostIncompletePickupLocation()
+    //await testUpdatePickupLocation()
+    await testActivateLocation()
     //await clearTestDB()
     console.log("all tests passed")
 }

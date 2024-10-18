@@ -312,7 +312,32 @@ app.put('/pickupLocation', async (req, res) => {
         const result = await updatePickupLocation(query, updateDoc);
         res.status(200).json({ matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: 'Failed to update pickup location' });
+    }
+});
+
+
+async function ActivatePickupLocation(filter){
+    result = await pickupLocations.updateMany({active : true}, {$set : {active : false}});
+    result = await pickupLocations.updateOne(filter, {$set: {active : true}});
+    return result
+}
+
+
+app.post('/activateLocation', async (req, res) => {
+    try {
+        if(!req.body._id){
+            res.error(400).json({error: 'Missing _id field'})
+        } else {
+            const idToActivate = {_id : new ObjectId(req.body._id)} 
+            const pickupLocation = await ActivatePickupLocation(idToActivate);
+            res.status(201).json({ message: 'active location changed', pickupLocation });
+            return pickupLocation
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Failed activate location' });
     }
 });
 
