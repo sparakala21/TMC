@@ -2,7 +2,7 @@
   "name": "tmc",
   "version": "1.0.0",
   "scripts": {
-    "frontend": "expo start --tunnel",
+    "frontend": "npx expo start --tunnel",
     "backend": "node ./BackEnd/bin/www",
     "start": "concurrently \"npm run frontend\" \"npm run backend\""
   },
