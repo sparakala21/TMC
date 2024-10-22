@@ -113,6 +113,9 @@ const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phoneNumber, setNumber] = useState('');
+
 
   // Modal state
   const [isModalVisible, setModalVisible] = useState(false);
@@ -125,6 +128,7 @@ const SignUpScreen = ({ navigation }) => {
   };
 
   const colorScheme = useColorScheme();
+  
   const colors = {
     background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
     placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000',
@@ -132,6 +136,22 @@ const SignUpScreen = ({ navigation }) => {
     inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',
     inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000',
   };
+
+  function isAllPresent(str) {
+    // Regex to check if a string
+    // contains uppercase, lowercase special character & numeric value
+    var pattern = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$%&*]).+$"
+    );
+
+    if (!str || str.length === 0) {
+      return false;
+    }
+    if (pattern.test(str)) {
+      return true
+    } 
+    return false
+    }
 
   const handleSignUp = () => {
     if (!email && !password) {
@@ -142,10 +162,24 @@ const SignUpScreen = ({ navigation }) => {
       showPopup('Please fill out your password');
     } else if (email.indexOf('@') < 0 || email.indexOf('.') < 0) {
       showPopup('Please fill out a valid email');
-    } else if (password !== confirmPassword) {
+    } else if (password.length < 8){
+      showPopup('Please fill out a Password that is at least 8 characters long');
+    } else if ( !(isAllPresent(password)) ){
+      showPopup('A Password should contain at least: both a lowercase and  an uppercase letters, a number and a special character(#$%&*) ');
+    }else if (password !== confirmPassword) {
       showPopup('Passwords do not match');
-    } else {
-      showPopup(`Account created for: ${email}`);
+    }//add api  pull else if  to compare with previous passwords, emails, and numbers?
+    //querey account  baseurl + /accounts?name=test&password=123
+
+    //else if( baseurl + /accounts?password=password){
+    // showPopup("Password is already taken ")}
+    //else if( baseurl + /accounts?email=email){
+    // showPopup("Email is already taken ")}
+    //else if( baseurl + /accounts?number=number){
+    // showPopup("Phone Number is already taken ")}
+    
+    else {
+      showPopup(`Account created for: email: ${email} password: ${password},  name: ${name}, phoneNumber: ${phoneNumber}`);
       // Server Implementation
     }
   };
@@ -155,8 +189,18 @@ const SignUpScreen = ({ navigation }) => {
   };
 
   return (
+    
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
+      headerImage={
+        <Image
+          source={require('@/assets/images/Trans_TMC_Logo.png')}
+          style={styles.restaurantLogo}
+        />
+      }
+    >
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+    <ThemedText type="title">Sign Up</ThemedText>
       <TextInput
         style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
         placeholder="Email"
@@ -182,6 +226,23 @@ const SignUpScreen = ({ navigation }) => {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+        placeholder="Name"
+        placeholderTextColor={colors.placeholderText}
+        value={name}
+        onChangeText={setName}
+        secureTextEntry
+      />
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+        placeholder="Phone Number"
+        placeholderTextColor={colors.placeholderText}
+        value={phoneNumber}
+        onChangeText={setNumber}
+        secureTextEntry
+      />
+
       <Button title="Sign Up" onPress={handleSignUp} color={colors.buttonColor} />
 
       {/* Back to Login Text */}
@@ -201,6 +262,7 @@ const SignUpScreen = ({ navigation }) => {
         </View>
       </Modal>
     </View>
+    </ParallaxScrollView>
   );
 };
 
