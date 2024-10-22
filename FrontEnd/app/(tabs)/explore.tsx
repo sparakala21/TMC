@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, View, Modal, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, View, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -51,7 +51,7 @@ export default function MenuScreen() {
     gulabJamun: 0,
   });
 
-const Sidebar = ({ selectedItems, onClose }) => {
+const Sidebar = ({ selectedItems, isVisible, onClose }) => {
   const navigation = useNavigation();
 
   const closeAndNavigate = () => {
@@ -65,27 +65,40 @@ const Sidebar = ({ selectedItems, onClose }) => {
   const total = subtotal + tax;
 
   return (
-    <ParallaxScrollView style={styles.sidebarContainer}>
-      <ThemedText type="subtitle" style={styles.sidebarTitle}>Your Cart</ThemedText>
-      {selectedItems.length > 0 ? (
-        selectedItems.map((item, index) => (
-          <ThemedText key={index}>{item}</ThemedText>
-        ))
-      ) : (
-        <ThemedText>No items in the cart.</ThemedText>
-      )}
-      <ThemedText>Subtotal: ${subtotal.toFixed(2)}</ThemedText>
-      <ThemedText>Tax: ${tax.toFixed(2)}</ThemedText>
-      <ThemedText type="defaultSemiBold">Total: ${total.toFixed(2)}</ThemedText>
+    <Modal transparent={true} animationType="slide" visible={isVisible}>
+      <View style={styles.overlay}>
+        <View style={styles.sidebarContainer}>
+          <ThemedText style={styles.sidebarTitle}>Your Cart</ThemedText>
+          <ScrollView
+           showsVerticalScrollIndicator={false}
+          >
+            {selectedItems.length > 0 ? (
+              selectedItems.map((item, index) => (
+                <View key={index} style={styles.itemContainer}>
+                  <ThemedText key={index}>{item}</ThemedText>
+                  <ThemedText style={styles.itemPrice}>${priceLookup[item].toFixed(2)}</ThemedText>
+                </View>
+              ))
+            ) : (
+              <ThemedText>No items in the cart.</ThemedText>
+            )}
+            <ThemedText>{'\n'}Subtotal: ${subtotal.toFixed(2)}</ThemedText>
+            <ThemedText>Tax: ${tax.toFixed(2)}</ThemedText>
+            <ThemedText type="defaultSemiBold">Total: ${total.toFixed(2)}</ThemedText>
 
-      <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-        <ThemedText style={styles.closeButtonText}>X</ThemedText>
-      </TouchableOpacity>
+            <View style={styles.bottomPadding} />
+          </ScrollView>
 
-      <TouchableOpacity onPress={closeAndNavigate} style={styles.navigateButton}>
-        <ThemedText style={styles.navigateText}>Checkout</ThemedText>
-      </TouchableOpacity> 
-    </ParallaxScrollView>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <ThemedText style={styles.closeButtonText}>X</ThemedText>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={closeAndNavigate} style={styles.navigateButton}>
+            <ThemedText style={styles.navigateText}>Checkout</ThemedText>
+          </TouchableOpacity> 
+        </View>
+      </View>
+    </Modal>
   );
 };
 
@@ -94,7 +107,6 @@ const Sidebar = ({ selectedItems, onClose }) => {
 const [selectedItems, setSelectedItems] = useState([]);
 
 const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-const sidebarWidth = 400;
 
 const [cart, setCart] = useState([]);
 
@@ -163,7 +175,7 @@ const hasItemsInCart = Object.values(quantities).some(q => q > 0);
       {isSidebarVisible && (
         <Sidebar selectedItems={selectedItems} onClose={handleCloseSidebar} />
       )}
-      <View style={[styles.contentContainer, { marginRight: isSidebarVisible ? sidebarWidth : 0 }]}>
+      <View style={[styles.contentContainer, { marginRight: isSidebarVisible }]}>
         <ParallaxScrollView
           showsVerticalScrollIndicator={true}
           showsHorizontalScrollIndicator={false}
@@ -340,20 +352,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFA726',
     alignItems: 'center',
   },
+  // For Sidebar
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   sidebarContainer: {
-    position: 'absolute',
-    right: 0,
-    top: 50,
-    width: 400,
-    height: '100%',
+    width: '70%',
+    height: '70%',
     backgroundColor: '#D88A3C',
+    borderRadius: 10,
     padding: 20,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    zIndex: 100,
   },
   sidebarTitle: {
     textAlign: 'center',
@@ -364,9 +380,10 @@ const styles = StyleSheet.create({
   closeButton: {
     position: 'absolute',
     marginTop: 5,
-    top: 10,
+    top: 0,
     right: 10,
     padding: 5,
+    borderRadius: 10,
     backgroundColor: '#000000',
     alignItems: 'center',
   },
@@ -375,12 +392,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#e5dccf',
   },
+  // Only used to right justify the prices in sidebar
+  itemPrice: {
+    textAlign: 'right',
+  },
+  bottomPadding: {
+    height: 60,
+  },
   navigateButton: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     padding: 15,
+    borderRadius: 10,
     backgroundColor: '#F54302',
     alignItems: 'center',
   },
