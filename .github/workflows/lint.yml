@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - automatedTest
   pull_request:
     branches:
       - main
