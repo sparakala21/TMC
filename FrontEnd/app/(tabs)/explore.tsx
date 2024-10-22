@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, View, Modal, TouchableOpacity } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -65,7 +65,7 @@ const Sidebar = ({ selectedItems, onClose }) => {
   const total = subtotal + tax;
 
   return (
-    <ThemedView style={styles.sidebarContainer}>
+    <ParallaxScrollView style={styles.sidebarContainer}>
       <ThemedText type="subtitle" style={styles.sidebarTitle}>Your Cart</ThemedText>
       {selectedItems.length > 0 ? (
         selectedItems.map((item, index) => (
@@ -85,7 +85,7 @@ const Sidebar = ({ selectedItems, onClose }) => {
       <TouchableOpacity onPress={closeAndNavigate} style={styles.navigateButton}>
         <ThemedText style={styles.navigateText}>Checkout</ThemedText>
       </TouchableOpacity> 
-    </ThemedView>
+    </ParallaxScrollView>
   );
 };
 
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   sidebarContainer: {
     position: 'absolute',
     right: 0,
-    top: 0,
+    top: 50,
     width: 400,
     height: '100%',
     backgroundColor: '#D88A3C',
