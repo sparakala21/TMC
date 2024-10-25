@@ -3,11 +3,12 @@ const { MenuItem, Order, Account, PickupLocation } = require("./models.js");
 const assert = require("assert");
 
 function testCreateMenuItem(){
+
     const exampleItem = {  
         _id : 1,
         name : "example",
         price : 23.4,
-        allergen : "vegetarian",
+        allergen : ["vegetarian"],
         description : "leaves",
         image : "www.example.com" 
     };
@@ -26,7 +27,7 @@ function testCreateEmptyMenuItem(){
     
     assert.strictEqual(menuItem.name, "", "name should be empty");
     assert.strictEqual(menuItem.price, -1, "price should equal be -1");
-    assert.strictEqual(menuItem.allergen, "", "allergen should be empty");
+    assert.strictEqual(menuItem.allergen, [], "allergen should be empty");
     assert.strictEqual(menuItem.description, "", "description should be empty");
 }
 
@@ -45,10 +46,65 @@ function testCreateMenuItemWithNullInput(){
     assert.strictEqual(menuItem._id, null, "id should be null");
     assert.strictEqual(menuItem.name, "", "name should be empty");
     assert.strictEqual(menuItem.price, -1, "price should be -1");
-    assert.strictEqual(menuItem.allergen, "", "allergen should be empty");
+    assert.strictEqual(menuItem.allergen, [], "allergen should be empty");
     assert.strictEqual(menuItem.description, "", "description should be empty");
 }
 
+function testCreateMenuItemWithId(){
+
+    const exampleItem = {  
+        _id : 1
+    };
+    const menuItem = new MenuItem(exampleItem);
+    
+    assert.strictEqual(menuItem._id, exampleItem._id, "id should equal exampleItem.id");
+    assert.strictEqual(menuItem.name, "", "name should be empty");
+    assert.strictEqual(menuItem.price, -1, "price should be -1");
+    assert.strictEqual(menuItem.allergen, [], "allergen should be empty");
+    assert.strictEqual(menuItem.description, "", "description should be empty");
+}
+
+function testCreateMenuItemWithName(){
+
+    const exampleItem = {  
+        name : test
+    };
+    const menuItem = new MenuItem(exampleItem);
+    
+    assert.strictEqual(menuItem._id, null, "id should be null");
+    assert.strictEqual(menuItem.name, exampleItem.name, "name should equal exampleItem.name");
+    assert.strictEqual(menuItem.price, -1, "price should be -1");
+    assert.strictEqual(menuItem.allergen, [], "allergen should be empty");
+    assert.strictEqual(menuItem.description, "", "description should be empty");
+}
+
+function testCreateMenuItemWithPrice(){
+
+    const exampleItem = {  
+        price : 1.50
+    };
+    const menuItem = new MenuItem(exampleItem);
+    
+    assert.strictEqual(menuItem._id, null, "id should be null");
+    assert.strictEqual(menuItem.name, "", "name should be empty");
+    assert.strictEqual(menuItem.price, exampleItem.price, "price should equal exampleItem.price");
+    assert.strictEqual(menuItem.allergen, [], "allergen should be empty");
+    assert.strictEqual(menuItem.description, "", "description should be empty");
+}
+
+function testCreateMenuItemWithAllergen(){
+
+    const exampleItem = {  
+        allergen : ["milk", "eggs"]
+    };
+    const menuItem = new MenuItem(exampleItem);
+    
+    assert.strictEqual(menuItem._id, null, "id should be null");
+    assert.strictEqual(menuItem.name, "", "name should be empty");
+    assert.strictEqual(menuItem.price, -1, "price should equal -1");
+    assert.strictEqual(menuItem.allergen, exampleItem.allergen, "allergen should equal exampleItem.allergen");
+    assert.strictEqual(menuItem.description, "", "description should be empty");
+}
 
 function testCreateOrder(){
     const exampleOrder = {  
