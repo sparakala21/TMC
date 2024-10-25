@@ -4,6 +4,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useIsFocused, useNavigation } from '@react-navigation/native'
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 // Once backend is finished, add to cart should send itemNames array to backend to add to said person's account
 
@@ -75,7 +76,7 @@ const Sidebar = ({ selectedItems, isVisible, onClose }) => {
             {selectedItems.length > 0 ? (
               selectedItems.map((item, index) => (
                 <View key={index} style={styles.itemContainer}>
-                  <ThemedText key={index}>{item}</ThemedText>
+                  <ThemedText style={styles.item} key={index}>{item}</ThemedText>
                   <ThemedText style={styles.itemPrice}>${priceLookup[item].toFixed(2)}</ThemedText>
                 </View>
               ))
@@ -164,9 +165,13 @@ const handleAddToCart = () => {
   setIsSidebarVisible(true);
 };
 
+const handleViewCart = () => {
+  setIsSidebarVisible(true);
+};
+
 const handleCloseSidebar = () => {
     setIsSidebarVisible(false);
-  };
+};
 
 const hasItemsInCart = Object.values(quantities).some(q => q > 0);
 
@@ -265,13 +270,17 @@ const hasItemsInCart = Object.values(quantities).some(q => q > 0);
             />
           </ThemedView>
         </ParallaxScrollView>
-
+          <View style={styles.fixedButtonContainer}>
+            <TouchableOpacity style={styles.viewCartButton} onPress={handleViewCart}>
+              <Icon name="shopping-cart" size={36} color="#FFF" />
+            </TouchableOpacity>
         {hasItemsInCart && (
-          <TouchableOpacity style={styles.fixedButton} onPress={handleAddToCart}>
-            <ThemedText>Add to Cart</ThemedText>
-          </TouchableOpacity>
-        )}
+            <TouchableOpacity style={styles.fixedButton} onPress={handleAddToCart}>
+              <ThemedText>Add to Cart</ThemedText>
+            </TouchableOpacity>
+          )}
         </View>
+      </View>
     </View>
   );
 }
@@ -343,6 +352,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  fixedButtonContainer: {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  flexDirection: 'column',
+  alignItems: 'center',
+  },
+  viewCartButton: {
+  width: 60,
+  height: 60,
+  borderRadius: 30,
+  backgroundColor: '#FFA726',
+  justifyContent: 'center',
+  alignItems: 'center',
+  position: 'absolute',
+  bottom: 60, 
+  right: 25, 
+  elevation: 5, 
+  shadowColor: '#000', 
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 4,
+  },
   fixedButton: {
     position: 'absolute',
     bottom: 0,
@@ -364,7 +397,7 @@ const styles = StyleSheet.create({
     height: '70%',
     backgroundColor: '#D88A3C',
     borderRadius: 10,
-    padding: 20,
+    padding: 40,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -372,9 +405,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   sidebarTitle: {
+    padding: 10,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 32,
+  },
+  item: {
+    top: 20,
   },
   // For Sidebar
   closeButton: {
@@ -394,6 +431,7 @@ const styles = StyleSheet.create({
   },
   // Only used to right justify the prices in sidebar
   itemPrice: {
+    top: 20,
     textAlign: 'right',
   },
   bottomPadding: {
