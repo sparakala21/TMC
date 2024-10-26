@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
+import {Account} from '../../../BackEnd/models.js';
 
 const Stack = createStackNavigator();
 
@@ -110,11 +111,16 @@ const LoginScreen = ({ navigation }) => {
 };
 
 const SignUpScreen = ({ navigation }) => {
+
+  // Account;
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [phoneNumber, setNumber] = useState('');
+
+  
 
 
   // Modal state
@@ -155,7 +161,7 @@ const SignUpScreen = ({ navigation }) => {
 
   const handleSignUp = () => {
     if (!email && !password) {
-      showPopup('Please fill out both fields');
+      showPopup('Please fill out all fields');
     } else if (!email) {
       showPopup('Please fill out your email');
     } else if (!password) {
@@ -168,19 +174,53 @@ const SignUpScreen = ({ navigation }) => {
       showPopup('A Password should contain at least: both a lowercase and  an uppercase letters, a number and a special character(#$%&*) ');
     }else if (password !== confirmPassword) {
       showPopup('Passwords do not match');
-    }//add api  pull else if  to compare with previous passwords, emails, and numbers?
-    //querey account  baseurl + /accounts?name=test&password=123
-
-    //else if( baseurl + /accounts?password=password){
-    // showPopup("Password is already taken ")}
-    //else if( baseurl + /accounts?email=email){
-    // showPopup("Email is already taken ")}
-    //else if( baseurl + /accounts?number=number){
-    // showPopup("Phone Number is already taken ")}
+    }
     
+    //add api  pull else if  to compare with previous passwords, emails, and numbers?
+
+    /*
+    //find if these objects are available
+    find_username = await fetchData(BASE_URL + '/accounts?_email='+ insertedId)
+    find_password = await fetchData(BASE_URL + '/accounts?_password='+ password)
+    find_phone_number = await fetchData(BASE_URL + '/accounts?_phone='+ phoneNumber)
+
+    //---Query for Email + Phone Number + Passwords---
+   
+    else if( !(find_username) ){
+      // showPopup("Email is already taken ")
+    }
+    else if( !(find_password) ){
+      showPopup("Password is already taken ")
+    }
+    else if( !(find_phone_number) ){
+      showPopup("Phone Number is already taken ")
+    }
+    
+    }*/
+
     else {
       showPopup(`Account created for: email: ${email} password: ${password},  name: ${name}, phoneNumber: ${phoneNumber}`);
+      
+      let data = {
+
+        id : null,
+        name : name,
+        email : email,
+        phone : phoneNumber,
+        accessLevel: -1,
+        cart: []
+    
+      }
+
       // Server Implementation
+      let new_acc = new Account(data);
+      /*
+
+      }
+      */
+
+      //testPostAccount();
+
     }
   };
 
