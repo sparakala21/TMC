@@ -10,6 +10,23 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isAdmin, setIsAdmin] = useState(false); // Change this to false to test
 
+  // Log the isAdmin state for debugging
+  console.log('Is Admin:', isAdmin);
+
+  // Create tab configuration based on isAdmin state
+  const adminTab = isAdmin ? (
+    <Tabs.Screen
+      name="adminpage"
+      options={{
+        title: 'Admin',
+        tabBarIcon: ({ color, focused }) => (
+          <TabBarIcon name={focused ? 'settings' : 'settings-outline'} color={color} />
+        ),
+        lazy: true,
+      }}
+    />
+  ) : null;
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Tabs
@@ -51,23 +68,15 @@ export default function TabLayout() {
         <Tabs.Screen
           name="cart"
           options={{
-            title: 'Cart',
+            title: 'Checkout',
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon name={focused ? 'cart' : 'cart-outline'} color={color} />
             ),
           }}
         />
         
-        <Tabs.Screen
-          name="adminpage"
-          options={{
-            title: 'Admin',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? 'settings' : 'settings-outline'} color={color} />
-            ),
-            lazy: true,
-          }}
-        />
+        {/* Conditionally render Admin Tab */}
+        {adminTab}
       </Tabs>
     </ThemeProvider>
   );
