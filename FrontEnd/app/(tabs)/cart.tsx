@@ -1,25 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, Modal, View, Text, Button, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Modal, View, Text, Button } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-import { CreditCard, PaymentForm } from "react-square-web-payments-sdk";
-import { submitPayment } from "/BackEnd/action.js";
-
-const appId = "sandbox-sq0idb-6C_TWTh6OnGyAgGXAsBkqw"
-const locationId = "main"
-
 export default function CartScreen() {
   const [isCartModalVisible, setCartModalVisible] = useState(false);
+  const [isNewModalVisible, setIsNewModalVisible] = useState(false); // New modal state
   const [cart, setCart] = useState([]);  // Array holding cart items
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);  // Sidebar is always visible
   const isFocused = useIsFocused();
   const navigation = useNavigation();
-  const navigateToPayment = () => {
-    navigation.navigate('Payment');
-  }
 
   // Check if the cart is empty
   const isCartEmpty = cart.length === 0;
@@ -42,6 +33,15 @@ export default function CartScreen() {
     navigation.navigate('explore');  // Navigate to Menu screen
   };
 
+  const openNewModal = () => {
+    setCartModalVisible(false); // Close current modal
+    setIsNewModalVisible(true); // Open new modal
+  };
+
+  const closeNewModal = () => {
+    setIsNewModalVisible(false); // Close new modal
+  };
+
   return (
     <ThemedView style={{ flex: 1 }}>
       <ParallaxScrollView
@@ -55,45 +55,29 @@ export default function CartScreen() {
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Payment Options</ThemedText>
         </ThemedView>
-        <ThemedView style={styles.stepContainer}></ThemedView>
+        <ThemedView style={styles.stepContainer}>
           <ThemedText type="subtitle">1. Apple Pay</ThemedText>
           <Image
             source={require('@/assets/images/applepaylogo.png')}
-            style= {styles.invertedapplePayLogo}
+            style={styles.invertedapplePayLogo}
           />
           <ThemedText type="subtitle">2. Google Pay</ThemedText>
           <Image
             source={require('@/assets/images/googlepaylogo.svg.png')}
-            style= {styles.googlePayLogo}
+            style={styles.googlePayLogo}
           />
           <ThemedText type="subtitle">3. Venmo</ThemedText>
           <Image
             source={require('@/assets/images/Venmo_logo.png')}
-            style= {styles.venmoLogo}
+            style={styles.venmoLogo}
           />
           <ThemedText type="subtitle">4. Credit Card/Debit Card</ThemedText>
           <Image
             source={require('@/assets/images/6963703.png')}
-            style= {styles.creditCardLogo}  
+            style={styles.creditCardLogo}  
           />
-
-          <PaymentForm
-          applicationId={appId}
-          locationId={locationId}
-          cardTokenizeResponseReceived={async (token) =>{
-            const result = await submitPayment(token.token);
-            console.log(result);
-          }}
-          >
-             <CreditCard />
-
-          </PaymentForm>
-
-
-        <ThemedView style={styles.stepContainer}></ThemedView>
+        </ThemedView>
       </ParallaxScrollView>
-
-      
 
       {/* Modal for Empty Cart */}
       <Modal
@@ -108,8 +92,23 @@ export default function CartScreen() {
               style={styles.emptyCartImage}
             />
             <Button title="Add Items to Cart" onPress={closeModalAndNavigate} color="#" />
-            <Button title="Complete Order" onPress={navigateToPayment} />
+            <Button title="Complete Order" onPress={openNewModal} color="blue" />
             <Button title="View Payment Options" onPress={closeModal} color="#" />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Order Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isNewModalVisible}
+        onRequestClose={closeNewModal}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Order Summary</Text>
+            <Text style={styles.modalSubtitle}>Order Total: </Text>
+            <Button title="Close" onPress={closeNewModal} color="#FF7043" />
           </View>
         </View>
       </Modal>
@@ -140,7 +139,7 @@ const styles = StyleSheet.create({
   invertedapplePayLogo: {
     height: 75,
     width: 75,
-    tintColor: 'red',  // Change the color of the logo dynamically
+    tintColor: 'red',
     resizeMode: 'contain',
   },
   googlePayLogo: {
@@ -162,7 +161,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',  // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     backgroundColor: '#D88A3C',
@@ -180,11 +179,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#fff',
   },
   modalSubtitle: {
     fontSize: 14,
     color: '#888',
     marginBottom: 20,
   },
-  
 });
