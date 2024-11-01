@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
-import {Account} from '../../../BackEnd/models.js';
+
 
 const Stack = createStackNavigator();
 
@@ -213,7 +213,10 @@ const SignUpScreen = ({ navigation }) => {
       }
 
       // Server Implementation
-      let new_acc = new Account(data);
+      
+      
+      //let new_acc = new Account(data);
+      
       /*
 
       }
@@ -241,6 +244,23 @@ const SignUpScreen = ({ navigation }) => {
     >
     <View style={styles.container}>
     <ThemedText type="title">Sign Up</ThemedText>
+
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+        placeholder="Name"
+        placeholderTextColor={colors.placeholderText}
+        value={name}
+        onChangeText={setName}
+        secureTextEntry
+      />
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+        placeholder="Phone Number"
+        placeholderTextColor={colors.placeholderText}
+        value={phoneNumber}
+        onChangeText={setNumber}
+        secureTextEntry
+      />
       <TextInput
         style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
         placeholder="Email"
@@ -266,22 +286,7 @@ const SignUpScreen = ({ navigation }) => {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-        placeholder="Name"
-        placeholderTextColor={colors.placeholderText}
-        value={name}
-        onChangeText={setName}
-        secureTextEntry
-      />
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-        placeholder="Phone Number"
-        placeholderTextColor={colors.placeholderText}
-        value={phoneNumber}
-        onChangeText={setNumber}
-        secureTextEntry
-      />
+      
 
       <Button title="Sign Up" onPress={handleSignUp} color={colors.buttonColor} />
 
