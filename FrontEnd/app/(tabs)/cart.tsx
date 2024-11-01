@@ -5,6 +5,12 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
+import { CreditCard, PaymentForm } from "react-square-web-payments-sdk";
+import { submitPayment } from "/BackEnd/action.js";
+
+const appId = "sandbox-sq0idb-6C_TWTh6OnGyAgGXAsBkqw"
+const locationId = "main"
+
 export default function CartScreen() {
   const [isCartModalVisible, setCartModalVisible] = useState(false);
   const [cart, setCart] = useState([]);  // Array holding cart items
@@ -70,6 +76,20 @@ export default function CartScreen() {
             source={require('@/assets/images/6963703.png')}
             style= {styles.creditCardLogo}  
           />
+
+          <PaymentForm
+          applicationId={appId}
+          locationId={locationId}
+          cardTokenizeResponseReceived={async (token) =>{
+            const result = await submitPayment(token.token);
+            console.log(result);
+          }}
+          >
+             <CreditCard />
+
+          </PaymentForm>
+
+
         <ThemedView style={styles.stepContainer}></ThemedView>
       </ParallaxScrollView>
 

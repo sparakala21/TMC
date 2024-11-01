@@ -1,0 +1,16 @@
+{
+  "name": "tmc",
+  "version": "1.0.0",
+  "description": "This guide will walk you through setting up WSL, installing Git, cloning the Thunder Mountain Curry (TMC) repository, setting up Node.js, and installing the project dependencies.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react-square-web-payments-sdk": "^3.2.1",
+    "square": "^38.2.0"
+  }
+}
