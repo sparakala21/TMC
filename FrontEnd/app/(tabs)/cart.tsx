@@ -11,6 +11,9 @@ export default function CartScreen() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);  // Sidebar is always visible
   const isFocused = useIsFocused();
   const navigation = useNavigation();
+  const navigateToPayment = () => {
+    navigation.navigate('Payment');
+  }
 
   // Check if the cart is empty
   const isCartEmpty = cart.length === 0;
@@ -84,10 +87,9 @@ export default function CartScreen() {
               source={require('@/assets/images/grocerybag.png')}
               style={styles.emptyCartImage}
             />
-            <Text style={styles.modalText}>Your Bag is Empty</Text>
-            <Text style={styles.modalSubtitle}>It's lonely in here</Text>
-            <Button title="Order Now" onPress={closeModalAndNavigate} />
-            <Button title="Close" onPress={closeModal} color="#ff7043" />
+            <Button title="Add Items to Cart" onPress={closeModalAndNavigate} color="#" />
+            <Button title="Complete Order" onPress={navigateToPayment} />
+            <Button title="View Payment Options" onPress={closeModal} color="#" />
           </View>
         </View>
       </Modal>
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',  // Semi-transparent background
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: '#D88A3C',
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
