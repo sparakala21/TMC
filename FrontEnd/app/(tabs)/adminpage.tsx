@@ -1,242 +1,186 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, Modal, StyleSheet, useColorScheme, Image} from 'react-native';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, FlatList, TextInput, StyleSheet } from 'react-native';
+import axios from 'axios';
 
-const isAdmin = true;
+interface MenuItem {
+  _id: string;
+  name: string;
+  price: number;
+  description: string;
+}
+
+interface MenuItemFormData {
+  name: string;
+  price: string;
+  description: string;
+}
 
 const AdminPage = () => {
-
-  // Render "Not Allowed" message if the user is not an admin
-  if (!isAdmin) {
-    return (
-      <ParallaxScrollView
-        headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
-        headerImage={
-            <Image
-                source={require('@/assets/images/Trans_TMC_Logo.png')}
-                style={styles.restaurantLogo}
-            />
-        }>
-        <Text style={styles.notAllowedText}>You are not allowed to be here.</Text>
-      </ParallaxScrollView>
-    );
-  }
-
-  const [menuModalVisible, setMenuModalVisible] = useState(false); // Modal for menu management
-  const [locationModalVisible, setLocationModalVisible] = useState(false); // Modal for location management
-  const [newName, setNewName] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-  const [customLocation, setCustomLocation] = useState(''); // State for custom address input
-
-  // Popular locations state
-  const [popularLocations, setPopularLocations] = useState({
-    'Union': false,
-    'Farmers Market': false,
-    'Freshman Hill': false,
-    '86 Field': false,
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [newMenuItem, setNewMenuItem] = useState<MenuItemFormData>({ 
+    name: '', 
+    price: '', 
+    description: '' 
   });
+  const [editMode, setEditMode] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
-  const colorScheme = useColorScheme(); 
+  const BACKEND_URL = 'http://localhost:3000';
 
-  const colors = {
-    background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
-    placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000', 
-    buttonColor: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
-    inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',  
-    inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000', 
-  };
+  useEffect(() => {
+    fetchMenuItems();
+  }, []);
 
-  
-
-  // Handle saving the menu item
-  const saveMenuItem = () => {
-    if (!newName || !newPrice) {
-      Alert.alert('Error', 'Please provide both name and price.');
-      return;
+  const fetchMenuItems = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/menuItems`);
+      // Fix: Access the foundMenuItems array from the response structure
+      setMenuItems(response.data.foundMenuItems);
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
     }
-
-    // Save logic for menu item would go here
-
-    setMenuModalVisible(false);
   };
 
-  // Handle saving the location
-  const saveLocation = () => {
-    const selectedLocations = Object.entries(popularLocations)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([location]) => location);
-  
-    if (selectedLocations.length === 0 && !customLocation) {
-      Alert.alert('Error', 'Please select a location or add a new one.');
-      return;
+  const handleSubmit = async () => {
+    const method = editMode ? 'PUT' : 'POST';
+    const url = editMode 
+      ? `${BACKEND_URL}/menuItem?_id=${selectedItem?._id}` 
+      : `${BACKEND_URL}/menuItem`;
+
+    try {
+      const payload = {
+        name: newMenuItem.name,
+        price: parseFloat(newMenuItem.price),
+        description: newMenuItem.description,
+      };
+
+      if (method === 'PUT') {
+        await axios.put(url, payload);
+      } else {
+        await axios.post(url, payload);
+      }
+
+      fetchMenuItems();
+      resetForm();
+    } catch (error) {
+      console.error('Error creating/updating menu item:', error);
     }
-  
-    // Save logic for selected locations and custom location
-    console.log('Selected Popular Locations:', selectedLocations);
-    console.log('Custom Location:', customLocation);
-  
-    setLocationModalVisible(false);
   };
 
-  // // Toggle selection of a popular location
-  // const toggleLocation = (location) => {
-  //   setPopularLocations(prevState => ({
-  //     ...prevState,
-  //     [location]: !prevState[location],
-  //   }));
-  // };
+  const resetForm = () => {
+    setNewMenuItem({ name: '', price: '', description: '' });
+    setEditMode(false);
+    setSelectedItem(null);
+  };
+
+  const selectItemForEditing = (item: MenuItem) => {
+    setEditMode(true);
+    setSelectedItem(item);
+    setNewMenuItem({ 
+      name: item.name, 
+      price: item.price.toString(), 
+      description: item.description 
+    });
+  };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
-      headerImage={
-          <Image
-              source={require('@/assets/images/Trans_TMC_Logo.png')}
-              style={styles.restaurantLogo}
+    <View style={styles.container}>
+      <Text style={styles.header}>Admin Page - Manage Menu Items</Text>
+      
+      {/* Form for creating/editing menu items */}
+      <View style={styles.form}>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          value={newMenuItem.name}
+          onChangeText={(text) => setNewMenuItem({...newMenuItem, name: text})}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Price"
+          value={newMenuItem.price}
+          onChangeText={(text) => setNewMenuItem({...newMenuItem, price: text})}
+          keyboardType="decimal-pad"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Description"
+          value={newMenuItem.description}
+          onChangeText={(text) => setNewMenuItem({...newMenuItem, description: text})}
+          multiline
+        />
+        <Button
+          title={editMode ? "Update Item" : "Add Item"}
+          onPress={handleSubmit}
+        />
+        {editMode && (
+          <Button
+            title="Cancel"
+            onPress={resetForm}
+            color="red"
           />
-      }>
-      <ThemedText type="title">Admin Panel</ThemedText>
-    
+        )}
+      </View>
 
-      {/* Buttons for Menu and Pickup Locations */}
-      <Button title="Manage Menu" onPress={() => setMenuModalVisible(true)} />
-      <Button title="Manage Pickup Locations" onPress={() => setLocationModalVisible(true)} />
-
-      {/* Modal for managing menu items */}
-      <Modal visible={menuModalVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Manage Menu Item</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Item Name"
-              value={newName}
-              onChangeText={setNewName}
+      <FlatList
+        data={menuItems}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <View style={styles.menuItem}>
+            <Text style={styles.itemName}>{item.name} - ${item.price.toFixed(2)}</Text>
+            <Text style={styles.itemDescription}>{item.description}</Text>
+            <Button
+              title="Edit"
+              onPress={() => selectItemForEditing(item)}
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Item Price"
-              value={newPrice}
-              keyboardType="numeric"
-              onChangeText={setNewPrice}
-            />
-            <Button title="Save" onPress={saveMenuItem} />
-            <Button title="Cancel" onPress={() => setMenuModalVisible(false)} />
           </View>
-        </View>
-      </Modal>
-
-      {/* Modal for managing pickup locations */}
-      <Modal visible={locationModalVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Manage Pickup Location</Text>
-
-            {/* Checklist for popular locations */}
-            <View style={styles.checklistContainer}>
-              {Object.keys(popularLocations).map((location) => (
-                <View key={location} style={styles.checkboxContainer}>
-                  {/* <CheckBox
-                    value={popularLocations[location]}
-                    onValueChange={() => toggleLocation(location)}
-                  /> */}
-                  <Text style={styles.checkboxLabel}>{location}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Input for adding a custom location */}
-            <TextInput
-              style={styles.input}
-              placeholder="Custom Location Address"
-              value={customLocation}
-              onChangeText={setCustomLocation}
-              placeholderTextColor={colors.placeholderText}
-            />
-
-            <Button title="Save" onPress={saveLocation} />
-            <Button title="Cancel" onPress={() => setLocationModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
-    </ParallaxScrollView>
+        )}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flex: 1,
   },
-  title: {
+  header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
+  menuItem: {
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: '#f1f1f1',
     borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    width: '100%',
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  checklistContainer: {
-    width: '100%',
-    marginBottom: 15,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  checkboxLabel: {
-    marginLeft: 8,
+  itemName: {
     fontSize: 16,
-  },
-  restaurantLogo: {
-    height: 200, 
-    width: '100%', 
-    resizeMode: 'contain',
-    marginTop: 20,
-    marginBottom: 20, 
-  },
-  notAllowedContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-  },
-  notAllowedText: {
-    fontSize: 100,
-    justifyContent: 'center',
     fontWeight: 'bold',
-    color: 'red',
+  },
+  itemDescription: {
+    marginTop: 5,
+    color: '#666',
+  },
+  form: {
+    marginVertical: 20,
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    padding: 8,
+    marginVertical: 5,
   },
 });
 
