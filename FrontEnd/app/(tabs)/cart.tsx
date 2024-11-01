@@ -5,6 +5,8 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
+import {SquarePaymentsForm} from 'react-square-web-payments-sdk';
+import { submitPayment } from "/BackEnd/action.js";
 
 export default function CartScreen() {
  const [isCartModalVisible, setCartModalVisible] = useState(false);
@@ -84,6 +86,17 @@ export default function CartScreen() {
            source={require('@/assets/images/6963703.png')}
            style={styles.creditCardLogo} 
          />
+                   <PaymentForm
+          applicationId={appId}
+          locationId={locationId}
+          cardTokenizeResponseReceived={async (token) =>{
+            const result = await submitPayment(token.token);
+            console.log(result);
+          }}
+          >
+             <CreditCard />
+
+          </PaymentForm>
        </ThemedView>
      </ParallaxScrollView>
 
