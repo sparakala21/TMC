@@ -14,6 +14,7 @@ export default function CartScreen() {
  const navigation = useNavigation();
 
 
+
  // Check if the cart is empty
  const isCartEmpty = cart.length === 0;
 
@@ -48,6 +49,11 @@ export default function CartScreen() {
  const closeNewModal = () => {
    setIsNewModalVisible(false); // Close new modal
  };
+
+ const backToOrderSummary = () => {
+  setIsNewModalVisible(false);  // Close the current modal
+  setCartModalVisible(true);  // Open the cart modal
+};
 
 
  return (
@@ -89,39 +95,40 @@ export default function CartScreen() {
 
 
      {/* Modal for Empty Cart */}
-     <Modal
-       animationType="fade"
-       transparent={true}
-       visible={isCartModalVisible}
-       onRequestClose={closeModalAndNavigate}>
-       <View style={styles.modalContainer}>
-         <View style={styles.modalContent}>
-           <Image
-             source={require('@/assets/images/grocerybag.png')}
-             style={styles.emptyCartImage}
-           />
-           <Button title="Add Items to Cart" onPress={closeModalAndNavigate} color="#" />
-           <Button title="Complete Order" onPress={openNewModal} color="blue" />
-           <Button title="View Payment Options" onPress={closeModal} color="#" />
-         </View>
-       </View>
-     </Modal>
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={isCartModalVisible}
+      onRequestClose={closeModalAndNavigate}>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>Order Summary:</Text>
+          <Button title="Add Items to Cart" onPress={closeModalAndNavigate} color="red" />
+          <Button title="Complete Order" onPress={openNewModal} color="blue" />
+          <Button title="View Payment Options" onPress={closeModal} color="" />
+        </View>
+      </View>
+    </Modal>
 
-
-     {/* Order Modal */}
-     <Modal
-       animationType="slide"
-       transparent={true}
-       visible={isNewModalVisible}
-       onRequestClose={closeNewModal}>
-       <View style={styles.modalContainer}>
-         <View style={styles.modalContent}>
-           <Text style={styles.modalText}>Order Summary</Text>
-           <Text style={styles.modalSubtitle}>Order Total: </Text>
-           <Button title="Close" onPress={closeNewModal} color="#FF7043" />
-         </View>
-       </View>
-     </Modal>
+    {/* Order Modal */}
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isNewModalVisible}
+      onRequestClose={closeNewModal}>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>Order Total: </Text>
+          <Text style={styles.modalSubtitle}>Subtotal: $5.99 </Text>
+          <Text style={styles.modalSubtitle}>Tax: $0.53 </Text>
+          <Text style={styles.modalSubtitle}>Total: $6.52 </Text>
+          <Text style={styles.modalSubtitle}> </Text>
+          <Image source={require('@/assets/images/TMC_Logo.png')} style={styles.tmcLogo} />
+          <Button title="Back to Order Summary" onPress={backToOrderSummary} color="blue" />           
+          <Button title="Pay Now" onPress={closeNewModal} color="green" />
+        </View>
+      </View>
+    </Modal>
    </ThemedView>
  );
 }
@@ -194,9 +201,18 @@ const styles = StyleSheet.create({
  },
  modalSubtitle: {
    fontSize: 14,
-   color: '#888',
-   marginBottom: 20,
+   color: '#fff',
+   marginBottom: 5,
  },
+ tmcLogo: {
+  height: 75,
+  width: 75,
+  marginBottom: 20,
+  marginTop: 0,
+  borderRadius: 50, // Make the logo circular
+},
 });
+
+
 
 
