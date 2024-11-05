@@ -5,13 +5,15 @@ import axios from 'axios';
 interface MenuItem {
   _id: string;
   name: string;
-  price: number;
+  price: GLfloat;
+  allergen: string;
   description: string;
 }
 
 interface MenuItemFormData {
   name: string;
-  price: string;
+  price: GLfloat;
+  allergen: string;
   description: string;
 }
 
@@ -19,7 +21,8 @@ const AdminPage = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [newMenuItem, setNewMenuItem] = useState<MenuItemFormData>({ 
     name: '', 
-    price: '', 
+    price: 0, 
+    allergen: '',
     description: '' 
   });
   const [editMode, setEditMode] = useState(false);
@@ -50,7 +53,8 @@ const AdminPage = () => {
     try {
       const payload = {
         name: newMenuItem.name,
-        price: parseFloat(newMenuItem.price),
+        price: newMenuItem.price,
+        allergen: newMenuItem.allergen,
         description: newMenuItem.description,
       };
 
@@ -68,7 +72,7 @@ const AdminPage = () => {
   };
 
   const resetForm = () => {
-    setNewMenuItem({ name: '', price: '', description: '' });
+    setNewMenuItem({ name: '', price: 0, allergen: '', description: '' });
     setEditMode(false);
     setSelectedItem(null);
   };
@@ -78,14 +82,15 @@ const AdminPage = () => {
     setSelectedItem(item);
     setNewMenuItem({ 
       name: item.name, 
-      price: item.price.toString(), 
+      price: item.price, 
+      allergen: item.allergen,
       description: item.description 
     });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Admin Page - Manage Menu Items</Text>
+      <Text style={styles.header}>Admin Page</Text>
       
       {/* Form for creating/editing menu items */}
       <View style={styles.form}>
@@ -98,9 +103,15 @@ const AdminPage = () => {
         <TextInput
           style={styles.input}
           placeholder="Price"
-          value={newMenuItem.price}
-          onChangeText={(text) => setNewMenuItem({...newMenuItem, price: text})}
+          value={newMenuItem.price ? String(newMenuItem.price) : ''}
+          onChangeText={(text) => setNewMenuItem({...newMenuItem, price: parseFloat(text) || 0})}
           keyboardType="decimal-pad"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Allergen"
+          value={newMenuItem.allergen}
+          onChangeText={(text) => setNewMenuItem({...newMenuItem, allergen: text})}
         />
         <TextInput
           style={styles.input}
