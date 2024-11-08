@@ -1,35 +1,26 @@
-import React, { useState } from 'react';
-import { Image, StyleSheet, View, Modal, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, View, Modal, FlatList, ScrollView, TouchableOpacity } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useIsFocused, useNavigation } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
 
-// Once backend is finished, add to cart should send itemNames array to backend to add to said person's account
+const BACKEND_URL = 'http://localhost:3000';
 
-const priceLookup = {
-        samosa: 5.99,
-        pakoras: 6.99,
-        chickenCurry: 14.99,
-        veggieStew: 13.99,
-        mangoLassi: 4.99,
-        gulabJamun: 5.49,
-      };
-
-// MenuItem component to display each item with quantity controls
 const MenuItem = ({ itemName, itemTitle, itemDescription, itemPrice, onQuantityChange, quantities }) => (
   <ThemedView style={styles.itemContainer}>
     <View style={styles.textContainer}>
       <ThemedText type="defaultSemiBold">{itemTitle}</ThemedText>
       <ThemedText>{itemDescription}</ThemedText>
-      <ThemedText>Price: {itemPrice}</ThemedText>
+      <ThemedText>Price: ${Number(itemPrice).toFixed(2)}</ThemedText>
       
       <View style={styles.quantityContainer}>
         <TouchableOpacity style={styles.button} onPress={() => onQuantityChange(itemName, -1)}>
           <ThemedText>-</ThemedText>
         </TouchableOpacity>
-        <ThemedText>{quantities[itemName]}</ThemedText>
+        <ThemedText>{quantities[itemName] || 0}</ThemedText>
         <TouchableOpacity style={styles.button} onPress={() => onQuantityChange(itemName, 1)}>
           <ThemedText>+</ThemedText>
         </TouchableOpacity>
@@ -43,26 +34,105 @@ const MenuItem = ({ itemName, itemTitle, itemDescription, itemPrice, onQuantityC
 );
 
 export default function MenuScreen() {
-  const [quantities, setQuantities] = useState({
-    samosa: 0,
-    pakoras: 0,
-    chickenCurry: 0,
-    veggieStew: 0,
-    mangoLassi: 0,
-    gulabJamun: 0,
+  const [menuItems, setMenuItems] = useState([]);
+  const [quantities, setQuantities] = useState({});
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const [cart, setCart] = useState([]);
+  const [categorizedItems, setCategorizedItems] = useState({
+    appetizers: [],
+    mainDishes: [],
+    desserts: []
   });
 
-const Sidebar = ({ selectedItems, isVisible, onClose }) => {
-  const navigation = useNavigation();
+  useEffect(() => {
+    const loadMenuItems = async () => {
+      try {
+        const response = await axios.get(`${BACKEND_URL}/menuItems`);
+        const items = response.data.foundMenuItems || [];
+        setMenuItems(items);
+        
+        // Initialize quantities state with all items set to 0
+        const initialQuantities = {};
+        items.forEach(item => {
+          initialQuantities[item.name] = 0;
+        });
+        setQuantities(initialQuantities);
 
+        // Categorize items
+        const categorized = {
+          appetizers: items.filter(item => item.category === 'appetizer'),
+          mainDishes: items.filter(item => item.category === 'main'),
+          desserts: items.filter(item => item.category === 'dessert')
+        };
+        setCategorizedItems(categorized);
+      } catch (error) {
+        console.error('Error fetching menu items:', error);
+      }
+    };
+
+    loadMenuItems();
+  }, []);
+
+  const handleQuantityChange = (itemName, change) => {
+    setQuantities(prev => {
+      const newQuantities = {
+        ...prev,
+        [itemName]: Math.max(0, (prev[itemName] || 0) + change)
+      };
+
+      // Update selected items
+      const updatedSelectedItems = [];
+      Object.entries(newQuantities).forEach(([key, value]) => {
+        for (let i = 0; i < value; i++) {
+          updatedSelectedItems.push(key);
+        }
+      });
+      setSelectedItems(updatedSelectedItems);
+
+      return newQuantities;
+    });
+  };
+
+  const handleAddToCart = () => {
+    const updatedCart = [...cart];
+    menuItems.forEach(menuItem => {
+      const qty = quantities[menuItem.name] || 0;
+      if (qty > 0) {
+        const existingItemIndex = updatedCart.findIndex(cartItem => cartItem.name === menuItem.name);
+        if (existingItemIndex >= 0) {
+          updatedCart[existingItemIndex].quantity += qty;
+        } else {
+          updatedCart.push({
+            name: menuItem.name,
+            quantity: qty,
+            price: menuItem.price
+          });
+        }
+      }
+    });
+
+    setCart(updatedCart);
+    // Reset quantities
+    const resetQuantities = {};
+    menuItems.forEach(item => {
+      resetQuantities[item.name] = 0;
+    });
+    setQuantities(resetQuantities);
+    setIsSidebarVisible(true);
+  };
+
+const Sidebar = ({ cart, isVisible, onClose }) => {
+  const navigation = useNavigation();
+  
   const closeAndNavigate = () => {
     onClose();
     navigation.navigate('cart');
   };
 
-  // Variables to calculate
+  // Calculate totals from cart data
   const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const tax = subtotal * 0.08875;
+  const tax = subtotal * 0.08875; // 8.875% tax rate
   const total = subtotal + tax;
 
   return (
@@ -70,23 +140,32 @@ const Sidebar = ({ selectedItems, isVisible, onClose }) => {
       <View style={styles.overlay}>
         <View style={styles.sidebarContainer}>
           <ThemedText style={styles.sidebarTitle}>Your Cart</ThemedText>
-          <ScrollView
-           showsVerticalScrollIndicator={false}
-          >
-            {selectedItems.length > 0 ? (
-              selectedItems.map((item, index) => (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {cart.length > 0 ? (
+              cart.map((item, index) => (
                 <View key={index} style={styles.itemContainer}>
-                  <ThemedText style={styles.item} key={index}>{item}</ThemedText>
-                  <ThemedText style={styles.itemPrice}>${priceLookup[item].toFixed(2)}</ThemedText>
+                  <View style={styles.cartItemDetails}>
+                    <ThemedText style={styles.item}>
+                      {item.quantity}x {item.name}
+                    </ThemedText>
+                    <ThemedText style={styles.itemPrice}>
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </ThemedText>
+                  </View>
                 </View>
               ))
             ) : (
               <ThemedText>No items in the cart.</ThemedText>
             )}
-            <ThemedText>{'\n'}Subtotal: ${subtotal.toFixed(2)}</ThemedText>
-            <ThemedText>Tax: ${tax.toFixed(2)}</ThemedText>
-            <ThemedText type="defaultSemiBold">Total: ${total.toFixed(2)}</ThemedText>
-
+            
+            <View style={styles.totalsContainer}>
+              <ThemedText>Subtotal: ${subtotal.toFixed(2)}</ThemedText>
+              <ThemedText>Tax: ${tax.toFixed(2)}</ThemedText>
+              <ThemedText type="defaultSemiBold">
+                Total: ${total.toFixed(2)}
+              </ThemedText>
+            </View>
+            
             <View style={styles.bottomPadding} />
           </ScrollView>
 
@@ -94,91 +173,30 @@ const Sidebar = ({ selectedItems, isVisible, onClose }) => {
             <ThemedText style={styles.closeButtonText}>X</ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={closeAndNavigate} style={styles.navigateButton}>
-            <ThemedText style={styles.navigateText}>Checkout</ThemedText>
-          </TouchableOpacity> 
+          {cart.length > 0 && (
+            <TouchableOpacity onPress={closeAndNavigate} style={styles.navigateButton}>
+              <ThemedText style={styles.navigateText}>Checkout</ThemedText>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </Modal>
   );
 };
 
-
-// Array to hold the cart items
-const [selectedItems, setSelectedItems] = useState([]);
-
-const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-
-const [cart, setCart] = useState([]);
-
-const Divider = () => (
+  const Divider = () => (
   <View style={styles.divider} />
-);
-
-const handleQuantityChange = (item, change) => {
-  setQuantities((prev) => {
-    const newQuantities = {
-      ...prev,
-      [item]: Math.max(0, prev[item] + change),
-    };
-    // Test to see the items added to cart (uses variable itemName)
-    const updatedSelectedItems = [];
-      for (const [key, value] of Object.entries(newQuantities)) {
-        for (let i = 0; i < value; i++) {
-          updatedSelectedItems.push(key);
-        }
-      }
-
-    setSelectedItems(updatedSelectedItems);
-
-    return newQuantities;
-  });
-};
-
-const handleAddToCart = () => {
-  const updatedCart = [...cart];
-
-  for (const [item, qty] of Object.entries(quantities)) {
-    if (qty > 0) {
-      const existingItemIndex = updatedCart.findIndex(cartItem => cartItem.name === item);
-
-      if (existingItemIndex >= 0) {
-        updatedCart[existingItemIndex].quantity += qty;
-      } else {
-        updatedCart.push({ name: item, quantity: qty, price: priceLookup[item] });
-      }
-    }
-  }
-  setCart(updatedCart);
-
-  console.log("Items added to cart:", updatedCart);
-
-  setQuantities({
-    samosa: 0,
-    pakoras: 0,
-    chickenCurry: 0,
-    veggieStew: 0,
-    mangoLassi: 0,
-    gulabJamun: 0,
-  });
-
-  setIsSidebarVisible(true);
-};
-
-const handleViewCart = () => {
-  setIsSidebarVisible(true);
-};
-
-const handleCloseSidebar = () => {
-    setIsSidebarVisible(false);
-};
-
-const hasItemsInCart = Object.values(quantities).some(q => q > 0);
+  );
 
   return (
     <View style={styles.container}>
       {isSidebarVisible && (
-        <Sidebar selectedItems={selectedItems} onClose={handleCloseSidebar} />
+        <Sidebar 
+          selectedItems={selectedItems} 
+          onClose={() => setIsSidebarVisible(false)}
+          isVisible={isSidebarVisible}
+          cart={cart}
+        />
       )}
       <View style={[styles.contentContainer, { marginRight: isSidebarVisible }]}>
         <ParallaxScrollView
@@ -191,37 +209,27 @@ const hasItemsInCart = Object.values(quantities).some(q => q > 0);
               style={styles.restaurantLogo}
             />
           }>
+          
           <ThemedView style={styles.titleContainer}>
             <ThemedText type="title">Today's Menu</ThemedText>
           </ThemedView>
 
           <Divider />
 
-          {/* Visuals for the testing labeled Selected Items */}
-          <ThemedView style={styles.selectedItemsContainer}>
-          <ThemedText type="subtitle">Selected Items:</ThemedText>
-          <ThemedText>{selectedItems.length > 0 ? selectedItems.join(', ') : 'None'}</ThemedText>
-          </ThemedView>
-
           {/* Appetizers Section */}
           <ThemedView style={styles.sectionContainer}>
             <ThemedText style={styles.subtitle} type="subtitle">Appetizers</ThemedText>
-            <MenuItem
-              itemName="samosa"
-              itemTitle="Samosa Delight"
-              itemDescription="Delicious fried pastries stuffed with spiced potatoes, peas, and herbs."
-              itemPrice="$5.99"
-              onQuantityChange={handleQuantityChange}
-              quantities={quantities}
-            />
-            <MenuItem
-              itemName="pakoras"
-              itemTitle="Crispy Vegetable Pakoras"
-              itemDescription="Crunchy, deep-fried vegetable fritters served with chutney."
-              itemPrice="$6.99"
-              onQuantityChange={handleQuantityChange}
-              quantities={quantities}
-            />
+            {categorizedItems.appetizers.map((item, index) => (
+              <MenuItem
+                key={index}
+                itemName={item.name}
+                itemTitle={item.title || item.name}
+                itemDescription={item.description}
+                itemPrice={item.price}
+                onQuantityChange={handleQuantityChange}
+                quantities={quantities}
+              />
+            ))}
           </ThemedView>
 
           <Divider />
@@ -229,22 +237,17 @@ const hasItemsInCart = Object.values(quantities).some(q => q > 0);
           {/* Main Dishes Section */}
           <ThemedView style={styles.sectionContainer}>
             <ThemedText style={styles.subtitle} type="subtitle">Main Dishes</ThemedText>
-            <MenuItem
-              itemName="chickenCurry"
-              itemTitle="Thunder Chicken Curry"
-              itemDescription="A fiery chicken curry that packs a punch of heat and flavor."
-              itemPrice="$14.99"
-              onQuantityChange={handleQuantityChange}
-              quantities={quantities}
-            />
-            <MenuItem
-              itemName="veggieStew"
-              itemTitle="Mountain Coconut Veggie Stew"
-              itemDescription="Slow-cooked vegetables in a rich, creamy coconut sauce."
-              itemPrice="$13.99"
-              onQuantityChange={handleQuantityChange}
-              quantities={quantities}
-            />
+            {categorizedItems.mainDishes.map((item, index) => (
+              <MenuItem
+                key={index}
+                itemName={item.name}
+                itemTitle={item.title || item.name}
+                itemDescription={item.description}
+                itemPrice={item.price}
+                onQuantityChange={handleQuantityChange}
+                quantities={quantities}
+              />
+            ))}
           </ThemedView>
 
           <Divider />
@@ -252,29 +255,25 @@ const hasItemsInCart = Object.values(quantities).some(q => q > 0);
           {/* Desserts Section */}
           <ThemedView style={styles.sectionContainer}>
             <ThemedText style={styles.subtitle} type="subtitle">Desserts</ThemedText>
-            <MenuItem
-              itemName="mangoLassi"
-              itemTitle="Mango Lassi"
-              itemDescription="A sweet, refreshing yogurt-based mango drink."
-              itemPrice="$4.99"
-              onQuantityChange={handleQuantityChange}
-              quantities={quantities}
-            />
-            <MenuItem
-              itemName="gulabJamun"
-              itemTitle="Gulab Jamun"
-              itemDescription="Soft doughnuts soaked in a fragrant syrup."
-              itemPrice="$5.49"
-              onQuantityChange={handleQuantityChange}
-              quantities={quantities}
-            />
+            {categorizedItems.desserts.map((item, index) => (
+              <MenuItem
+                key={index}
+                itemName={item.name}
+                itemTitle={item.title || item.name}
+                itemDescription={item.description}
+                itemPrice={item.price}
+                onQuantityChange={handleQuantityChange}
+                quantities={quantities}
+              />
+            ))}
           </ThemedView>
         </ParallaxScrollView>
-          <View style={styles.fixedButtonContainer}>
-            <TouchableOpacity style={styles.viewCartButton} onPress={handleViewCart}>
-              <Icon name="shopping-cart" size={36} color="#FFF" />
-            </TouchableOpacity>
-        {hasItemsInCart && (
+
+        <View style={styles.fixedButtonContainer}>
+          <TouchableOpacity style={styles.viewCartButton} onPress={() => setIsSidebarVisible(true)}>
+            <Icon name="shopping-cart" size={36} color="#FFF" />
+          </TouchableOpacity>
+          {Object.values(quantities).some(q => q > 0) && (
             <TouchableOpacity style={styles.fixedButton} onPress={handleAddToCart}>
               <ThemedText>Add to Cart</ThemedText>
             </TouchableOpacity>
