@@ -9,11 +9,12 @@ import axios from 'axios';
 
 const BACKEND_URL = 'http://localhost:3000';
 
-const MenuItem = ({ itemName, itemTitle, itemDescription, itemPrice, onQuantityChange, quantities }) => (
+const MenuItem = ({ itemId, itemName, itemDescription, itemPrice, itemImage, itemAllergen, onQuantityChange, quantities }) => (
   <ThemedView style={styles.itemContainer}>
     <View style={styles.textContainer}>
-      <ThemedText type="defaultSemiBold">{itemTitle}</ThemedText>
+      <ThemedText type="defaultSemiBold">{itemName}</ThemedText>
       <ThemedText>{itemDescription}</ThemedText>
+      {itemAllergen && <ThemedText>Allergens: {itemAllergen}</ThemedText>}
       <ThemedText>Price: ${Number(itemPrice).toFixed(2)}</ThemedText>
       
       <View style={styles.quantityContainer}>
@@ -27,7 +28,7 @@ const MenuItem = ({ itemName, itemTitle, itemDescription, itemPrice, onQuantityC
       </View>
     </View>
     <Image
-      source={require('@/assets/images/icon.png')}
+      source={itemImage ? { uri: itemImage } : require('@/assets/images/icon.png')}
       style={styles.foodImage}
     />
   </ThemedView>
@@ -47,26 +48,32 @@ export default function MenuScreen() {
 
   useEffect(() => {
     const loadMenuItems = async () => {
-      try {
+      try 
+      {
         const response = await axios.get(`${BACKEND_URL}/menuItems`);
-        const items = response.data.foundMenuItems || [];
+        const items = Array.isArray(response.data) ? response.data : [];
         setMenuItems(items);
         
         // Initialize quantities state with all items set to 0
         const initialQuantities = {};
-        items.forEach(item => {
+        items.forEach(item => 
+        {
           initialQuantities[item.name] = 0;
         });
         setQuantities(initialQuantities);
 
         // Categorize items
-        const categorized = {
+        const categorized = 
+        {
           appetizers: items.filter(item => item.category === 'appetizer'),
           mainDishes: items.filter(item => item.category === 'main'),
           desserts: items.filter(item => item.category === 'dessert')
         };
         setCategorizedItems(categorized);
-      } catch (error) {
+      } 
+      
+      catch (error) 
+      {
         console.error('Error fetching menu items:', error);
       }
     };
@@ -74,17 +81,22 @@ export default function MenuScreen() {
     loadMenuItems();
   }, []);
 
-  const handleQuantityChange = (itemName, change) => {
-    setQuantities(prev => {
-      const newQuantities = {
+  const handleQuantityChange = (itemId, change) => 
+  {
+    setQuantities(prev => 
+    {
+      const newQuantities = 
+      {
         ...prev,
-        [itemName]: Math.max(0, (prev[itemName] || 0) + change)
+        [itemId]: Math.max(0, (prev[itemId] || 0) + change)
       };
 
       // Update selected items
       const updatedSelectedItems = [];
-      Object.entries(newQuantities).forEach(([key, value]) => {
-        for (let i = 0; i < value; i++) {
+      Object.entries(newQuantities).forEach(([key, value]) => 
+      {
+        for (let i = 0; i < value; i++) 
+        {
           updatedSelectedItems.push(key);
         }
       });
@@ -94,16 +106,23 @@ export default function MenuScreen() {
     });
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = () => 
+  {
     const updatedCart = [...cart];
-    menuItems.forEach(menuItem => {
-      const qty = quantities[menuItem.name] || 0;
-      if (qty > 0) {
-        const existingItemIndex = updatedCart.findIndex(cartItem => cartItem.name === menuItem.name);
-        if (existingItemIndex >= 0) {
+    menuItems.forEach(menuItem => 
+    {
+      const qty = quantities[menuItem._id] || 0;
+      if (qty > 0) 
+      {
+        const existingItemIndex = updatedCart.findIndex(cartItem => cartItem._id === menuItem._id);
+        if (existingItemIndex >= 0) 
+        {
           updatedCart[existingItemIndex].quantity += qty;
-        } else {
+        } 
+        else 
+        {
           updatedCart.push({
+            _id: menuItem._id,
             name: menuItem.name,
             quantity: qty,
             price: menuItem.price
@@ -113,26 +132,29 @@ export default function MenuScreen() {
     });
 
     setCart(updatedCart);
+
     // Reset quantities
     const resetQuantities = {};
     menuItems.forEach(item => {
-      resetQuantities[item.name] = 0;
+      resetQuantities[item._id] = 0;
     });
     setQuantities(resetQuantities);
     setIsSidebarVisible(true);
   };
 
-const Sidebar = ({ cart, isVisible, onClose }) => {
+const Sidebar = ({ cart, isVisible, onClose }) => 
+{
   const navigation = useNavigation();
   
-  const closeAndNavigate = () => {
+  const closeAndNavigate = () => 
+  {
     onClose();
     navigation.navigate('cart');
   };
 
   // Calculate totals from cart data
   const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const tax = subtotal * 0.08875; // 8.875% tax rate
+  const tax = subtotal * 0.08875; // NYS 8.875% tax rate
   const total = subtotal + tax;
 
   return (
@@ -142,8 +164,8 @@ const Sidebar = ({ cart, isVisible, onClose }) => {
           <ThemedText style={styles.sidebarTitle}>Your Cart</ThemedText>
           <ScrollView showsVerticalScrollIndicator={false}>
             {cart.length > 0 ? (
-              cart.map((item, index) => (
-                <View key={index} style={styles.itemContainer}>
+              cart.map((item) => (
+                <View key={item._id} style={styles.itemContainer}>
                   <View style={styles.cartItemDetails}>
                     <ThemedText style={styles.item}>
                       {item.quantity}x {item.name}
@@ -157,6 +179,8 @@ const Sidebar = ({ cart, isVisible, onClose }) => {
             ) : (
               <ThemedText>No items in the cart.</ThemedText>
             )}
+
+            <View style={styles.divider} />
             
             <View style={styles.totalsContainer}>
               <ThemedText>Subtotal: ${subtotal.toFixed(2)}</ThemedText>
@@ -219,13 +243,14 @@ const Sidebar = ({ cart, isVisible, onClose }) => {
           {/* Appetizers Section */}
           <ThemedView style={styles.sectionContainer}>
             <ThemedText style={styles.subtitle} type="subtitle">Appetizers</ThemedText>
-            {categorizedItems.appetizers.map((item, index) => (
+            {categorizedItems.appetizers.map((item) => (
               <MenuItem
-                key={index}
+                key={item._id}
+                itemId={item._id}
                 itemName={item.name}
-                itemTitle={item.title || item.name}
                 itemDescription={item.description}
                 itemPrice={item.price}
+                itemAllergen={item.allergen}
                 onQuantityChange={handleQuantityChange}
                 quantities={quantities}
               />
@@ -237,13 +262,14 @@ const Sidebar = ({ cart, isVisible, onClose }) => {
           {/* Main Dishes Section */}
           <ThemedView style={styles.sectionContainer}>
             <ThemedText style={styles.subtitle} type="subtitle">Main Dishes</ThemedText>
-            {categorizedItems.mainDishes.map((item, index) => (
+            {categorizedItems.mainDishes.map((item) => (
               <MenuItem
-                key={index}
+                key={item._id}
+                itemId={item._id}
                 itemName={item.name}
-                itemTitle={item.title || item.name}
                 itemDescription={item.description}
                 itemPrice={item.price}
+                itemAllergen={item.allergen}
                 onQuantityChange={handleQuantityChange}
                 quantities={quantities}
               />
@@ -255,13 +281,14 @@ const Sidebar = ({ cart, isVisible, onClose }) => {
           {/* Desserts Section */}
           <ThemedView style={styles.sectionContainer}>
             <ThemedText style={styles.subtitle} type="subtitle">Desserts</ThemedText>
-            {categorizedItems.desserts.map((item, index) => (
+            {categorizedItems.desserts.map((item) => (
               <MenuItem
-                key={index}
+                key={item._id}
+                itemId={item._id}
                 itemName={item.name}
-                itemTitle={item.title || item.name}
                 itemDescription={item.description}
                 itemPrice={item.price}
+                itemAllergen={item.allergen}
                 onQuantityChange={handleQuantityChange}
                 quantities={quantities}
               />
