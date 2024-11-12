@@ -9,6 +9,7 @@ import axios from 'axios';
 
 const BACKEND_URL = 'http://localhost:3000';
 
+// MenuItem object
 const MenuItem = ({ itemId, itemName, itemDescription, itemPrice, itemImage, itemAllergen, onQuantityChange, quantities }) => (
   <ThemedView style={styles.itemContainer}>
     <View style={styles.textContainer}>
@@ -18,11 +19,11 @@ const MenuItem = ({ itemId, itemName, itemDescription, itemPrice, itemImage, ite
       <ThemedText>Price: ${Number(itemPrice).toFixed(2)}</ThemedText>
       
       <View style={styles.quantityContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => onQuantityChange(itemName, -1)}>
+        <TouchableOpacity style={styles.button} onPress={() => onQuantityChange(itemId, -1)}>
           <ThemedText>-</ThemedText>
         </TouchableOpacity>
-        <ThemedText>{quantities[itemName] || 0}</ThemedText>
-        <TouchableOpacity style={styles.button} onPress={() => onQuantityChange(itemName, 1)}>
+        <ThemedText>{quantities[itemId] || 0}</ThemedText>
+        <TouchableOpacity style={styles.button} onPress={() => onQuantityChange(itemId, 1)}>
           <ThemedText>+</ThemedText>
         </TouchableOpacity>
       </View>
@@ -34,6 +35,7 @@ const MenuItem = ({ itemId, itemName, itemDescription, itemPrice, itemImage, ite
   </ThemedView>
 );
 
+// The components of the MenuScreen
 export default function MenuScreen() {
   const [menuItems, setMenuItems] = useState([]);
   const [quantities, setQuantities] = useState({});
@@ -46,6 +48,7 @@ export default function MenuScreen() {
     desserts: []
   });
 
+  // Used to connect to backend database
   useEffect(() => {
     const loadMenuItems = async () => {
       try 
@@ -81,6 +84,7 @@ export default function MenuScreen() {
     loadMenuItems();
   }, []);
 
+  // Function that updates an item's quantity when the counter actually changes
   const handleQuantityChange = (itemId, change) => 
   {
     setQuantities(prev => 
@@ -106,6 +110,7 @@ export default function MenuScreen() {
     });
   };
 
+  // Function to add items to the cart
   const handleAddToCart = () => 
   {
     const updatedCart = [...cart];
@@ -142,6 +147,7 @@ export default function MenuScreen() {
     setIsSidebarVisible(true);
   };
 
+// Sidebar component in MenuScreen
 const Sidebar = ({ cart, isVisible, onClose }) => 
 {
   const navigation = useNavigation();
@@ -207,12 +213,15 @@ const Sidebar = ({ cart, isVisible, onClose }) =>
     </Modal>
   );
 };
-
+  
+  // Divider component (just a bold horizontal line)
   const Divider = () => (
   <View style={styles.divider} />
   );
 
+  // Format frontend
   return (
+    // Sidebar status
     <View style={styles.container}>
       {isSidebarVisible && (
         <Sidebar 
@@ -222,6 +231,8 @@ const Sidebar = ({ cart, isVisible, onClose }) =>
           cart={cart}
         />
       )}
+
+      {/* Menu Section */}
       <View style={[styles.contentContainer, { marginRight: isSidebarVisible }]}>
         <ParallaxScrollView
           showsVerticalScrollIndicator={true}
@@ -296,9 +307,12 @@ const Sidebar = ({ cart, isVisible, onClose }) =>
           </ThemedView>
         </ParallaxScrollView>
 
+        {/* View Cart button and Sidebar access */}
         <View style={styles.fixedButtonContainer}>
           <TouchableOpacity style={styles.viewCartButton} onPress={() => setIsSidebarVisible(true)}>
-            <Icon name="shopping-cart" size={36} color="#FFF" />
+            <View style={styles.iconContainer}>
+              <Icon name="shopping-cart" size={36} color="#FFF" style={styles.cartIcon}/>
+            </View>
           </TouchableOpacity>
           {Object.values(quantities).some(q => q > 0) && (
             <TouchableOpacity style={styles.fixedButton} onPress={handleAddToCart}>
@@ -311,6 +325,7 @@ const Sidebar = ({ cart, isVisible, onClose }) =>
   );
 }
 
+// CSS Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -401,6 +416,20 @@ const styles = StyleSheet.create({
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.3,
   shadowRadius: 4,
+  },
+  iconContainer: {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  height: '100%',
+  },
+  cartIcon: {
+  textAlign: 'center',
+  textAlignVertical: 'center',
+  alignSelf: 'center',
+  right: 0.5,
+  bottom: 1,
   },
   fixedButton: {
     position: 'absolute',
