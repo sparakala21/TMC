@@ -5,320 +5,431 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
+import axios from 'axios'
+import { useNavigation } from 'expo-router';
 
+///Global stuff
+  const Stack = createStackNavigator();
 
-const Stack = createStackNavigator();
+  const BASE_URL = 'http://localhost:3000';
+  const ACC_URL = '..';
 
-const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  //Account_info
+  let user_id;
+
+//update JSON with
+  async function updateAccountsJSON(accountId) {
+    try {
+      // Read the existing accounts.json file
+      const accountsFilePath = `${ACC_URL}/accounts.json`;
+      const accountsData = await fs.readFile(accountsFilePath, 'utf8');
+      const accounts = JSON.parse(accountsData);
   
-  // Modal state
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState('');
-
-  // Function to show the modal popup
-  const showPopup = (content) => {
-    setModalContent(content);
-    setModalVisible(true);
-  };
-
-  const colorScheme = useColorScheme();
-  const colors = {
-    background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
-    placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000',
-    buttonColor: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
-    inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',
-    inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000',
-  };
-
-  const handleLogin = () => {
-    if (!email && !password) {
-      showPopup('Please fill out both fields');
-    } else if (!email) {
-      showPopup('Please fill out your email');
-    } else if (!password) {
-      showPopup('Please fill out your password');
-    } else if (email.indexOf('@') < 0 || email.indexOf('.') < 0) {
-      showPopup('Please fill out a valid email');
-    } else {
-      showPopup(`Email: ${email}\nPassword: ${password}`);
-      // Server implementation here
+      // Add the new account ID to the accounts array
+      accounts.push({ _id: accountId });
+  
+      // Write the updated accounts array back to the file
+      await fs.writeFile(accountsFilePath, JSON.stringify(accounts, null, 2));
+      console.log('Accounts JSON updated successfully');
+    } catch (error) {
+      console.error('Error updating accounts JSON:', error);
     }
-  };
+  }
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
+//LOGIN VVVVVVVVVVV
+  const LoginScreen = ({ navigation, setLoggedIn }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    
+    // Modal state
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [modalContent, setModalContent] = useState('');
 
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/Trans_TMC_Logo.png')}
-          style={styles.restaurantLogo}
-        />
+    // Function to show the modal popup
+    const showPopup = (content) => {
+      setModalContent(content);
+      setModalVisible(true);
+    };
+
+    const colorScheme = useColorScheme();
+    const colors = {
+      background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
+      placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000',
+      buttonColor: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
+      inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',
+      inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000',
+    };
+
+
+    const handleLogin = async () => {
+      if (!email && !password) {
+        showPopup('Please fill out both fields');
+      } else if (!email) {
+        showPopup('Please fill out your email');
+      } else if (!password) {
+        showPopup('Please fill out your password');
+      } else if (email.indexOf('@') < 0 || email.indexOf('.') < 0) {
+        showPopup('Please fill out a valid email');
+      } else {
+        // run backend run node mongo_functions.js
+        // Server implementation here
+        const find_email =  await axios.get(`${BASE_URL}/accounts?email=${email}`)
+        const find_account =  await axios.get(`${BASE_URL}/accounts?email=${email}&password=${password}`)
+        if(!!find_account.data){
+          showPopup(`Logging into:  ${email}`);
+          user_id = find_account.data._id;
+          // Update the JSON file with the user's account ID
+          await updateAccountsJSON(user_id);
+          //SUCCESSFULL LOGIN!
+          
+          setLoggedIn(true);
+          navigation.replace('Profile');
+          
+        
+        }
+        else if(!!find_email.data){//good Email bad password
+          showPopup(`Email found, Password is invalid`)
+        }
+        else{//bad Email
+          showPopup(`Email not found`)
+        }
+         
       }
-    >
-      <ThemedText type="title">Login</ThemedText>
+    };
 
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-        placeholder="Email"
-        placeholderTextColor={colors.placeholderText}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+    const toggleModal = () => {
+      setModalVisible(!isModalVisible);
+    };
 
-      <View style={styles.passwordContainer}>
+    return (
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
+        headerImage={
+          <Image
+            source={require('@/assets/images/Trans_TMC_Logo.png')}
+            style={styles.restaurantLogo}
+          />
+    }
+      >
+        <ThemedText type="title">Login</ThemedText>
+
         <TextInput
-          style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+          placeholder="Email"
+          placeholderTextColor={colors.placeholderText}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            placeholder="Password"
+            placeholderTextColor={colors.placeholderText}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Text style={styles.showHideText}>{showPassword ? 'Hide' : 'Show'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Button title="Login" onPress={handleLogin} color={colors.buttonColor} />
+
+        {/* Sign Up Text */}
+        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.signUpText}>Don't have an account? Sign up</Text>
+        </TouchableOpacity>
+
+        {/* Modal for Errors */}
+        <Modal
+          isVisible={isModalVisible}
+          onBackdropPress={toggleModal} // Close modal on backdrop press
+          style={styles.modal}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{modalContent}</Text>
+            <Button title="Close" onPress={toggleModal} />
+          </View>
+        </Modal>
+      </ParallaxScrollView>
+    );
+  };
+
+//SIGN UP VVVVVVVV
+  const SignUpScreen = ({ navigation, setLoggedIn }) => {
+
+    // Account;
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [name, setName] = useState('');
+    const [phoneNumber, setNumber] = useState('');
+
+    
+
+
+    // Modal state
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [modalContent, setModalContent] = useState('');
+
+    // Function to show the modal popup
+    const showPopup = (content) => {
+      setModalContent(content);
+      setModalVisible(true);
+    };
+
+    const colorScheme = useColorScheme();
+    
+    const colors = {
+      background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
+      placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000',
+      buttonColor: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
+      inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',
+      inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000',
+    };
+
+    function isAllPresent(str) {
+      // Regex to check if a string
+      // contains uppercase, lowercase special character & numeric value
+      var pattern = new RegExp(
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$%&*]).+$"
+      );
+
+      if (!str || str.length === 0) {
+        return false;
+      }
+      if (pattern.test(str)) {
+        return true
+      } 
+      return false
+      }
+      
+      
+    const handleSignUp = async () => {
+
+      //BACKEND find if these objects are available
+        const find_email = await axios.get(`${BASE_URL}/accounts?email=${email}`)
+        const find_phone_number = await axios.get(`${BASE_URL}/accounts?email=${email}`)
+
+
+      if (!email && !password) {
+        showPopup('Please fill out all fields');
+      } else if (!email) {
+        showPopup('Please fill out your email');
+      } else if (!password) {
+        showPopup('Please fill out your password');
+      } else if (email.indexOf('@') < 0 || email.indexOf('.') < 0) {
+        showPopup('Please fill out a valid email');
+      } else if (password.length < 8){
+        showPopup('Please fill out a Password that is at least 8 characters long');
+      } else if ( !(isAllPresent(password)) ){
+        showPopup('A Password should contain at least: both a lowercase and  an uppercase letters, a number and a special character(#$%&*) ');
+      }else if (password !== confirmPassword) {
+        showPopup('Passwords do not match');
+      }
+      //---Query for Email + Phone Number + Passwords---
+      else if( !!find_email.data ){
+        showPopup("Email is already taken ")
+      }
+      else if( !!find_phone_number.data ){
+        showPopup("Phone number is already taken ")
+      }
+      else if( (!!!find_phone_number.data) ){
+        showPopup("Phone Number is already taken ")
+      }
+      else {
+        
+        
+        const payload = {
+          name: name,
+          email: email,
+          phone: phoneNumber,
+          password: password,
+          accessLevel: 0
+        };
+
+        await updateAccountsJSON(find_email.data._id);
+        axios.put(BASE_URL, payload);
+        showPopup(`Account created for: email: ${email} password: ${password},  name: ${name}, phoneNumber: ${phoneNumber}`);
+        }
+        
+    };
+
+    const toggleModal = () => {
+      setModalVisible(!isModalVisible);
+    };
+
+    return (
+      
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
+        headerImage={
+          <Image
+            source={require('@/assets/images/Trans_TMC_Logo.png')}
+            style={styles.restaurantLogo}
+          />
+        }
+      >
+      <View style={styles.container}>
+      <ThemedText type="title">Sign Up</ThemedText>
+
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+          placeholder="Name"
+          placeholderTextColor={colors.placeholderText}
+          value={name}
+          onChangeText={setName}
+          secureTextEntry
+        />
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+          placeholder="Phone Number"
+          placeholderTextColor={colors.placeholderText}
+          value={phoneNumber}
+          onChangeText={setNumber}
+          secureTextEntry
+        />
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+          placeholder="Email"
+          placeholderTextColor={colors.placeholderText}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
           placeholder="Password"
           placeholderTextColor={colors.placeholderText}
           value={password}
           onChangeText={setPassword}
-          secureTextEntry={!showPassword}
+          secureTextEntry
         />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Text style={styles.showHideText}>{showPassword ? 'Hide' : 'Show'}</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+          placeholder="Confirm Password"
+          placeholderTextColor={colors.placeholderText}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
+        
+
+        <Button title="Sign Up" onPress={handleSignUp} color={colors.buttonColor} />
+
+        {/* Back to Login Text */}
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.backToLoginText}>Already have an account? Login</Text>
         </TouchableOpacity>
+
+        {/* Modal for Errors */}
+        <Modal
+          isVisible={isModalVisible}
+          onBackdropPress={toggleModal} // Close modal on backdrop press
+          style={styles.modal}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{modalContent}</Text>
+            <Button title="Close" onPress={toggleModal} />
+          </View>
+        </Modal>
       </View>
-
-      <Button title="Login" onPress={handleLogin} color={colors.buttonColor} />
-
-      {/* Sign Up Text */}
-      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.signUpText}>Don't have an account? Sign up</Text>
-      </TouchableOpacity>
-
-      {/* Modal for Errors */}
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={toggleModal} // Close modal on backdrop press
-        style={styles.modal}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{modalContent}</Text>
-          <Button title="Close" onPress={toggleModal} />
-        </View>
-      </Modal>
-    </ParallaxScrollView>
-  );
-};
-
-const SignUpScreen = ({ navigation }) => {
-
-  // Account;
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
-  const [phoneNumber, setNumber] = useState('');
-
-  
-
-
-  // Modal state
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState('');
-
-  // Function to show the modal popup
-  const showPopup = (content) => {
-    setModalContent(content);
-    setModalVisible(true);
-  };
-
-  const colorScheme = useColorScheme();
-  
-  const colors = {
-    background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
-    placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000',
-    buttonColor: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
-    inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',
-    inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000',
-  };
-
-  function isAllPresent(str) {
-    // Regex to check if a string
-    // contains uppercase, lowercase special character & numeric value
-    var pattern = new RegExp(
-      "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$%&*]).+$"
+      </ParallaxScrollView>
     );
-
-    if (!str || str.length === 0) {
-      return false;
-    }
-    if (pattern.test(str)) {
-      return true
-    } 
-    return false
-    }
-    
-    //find if these objects are available
-    let find_username = await fetchData(BASE_URL + '/accounts?_email='+ insertedId)
-    let find_password = await fetchData(BASE_URL + '/accounts?_password='+ password)
-    let find_phone_number = await fetchData(BASE_URL + '/accounts?_phone='+ phoneNumber)
-
-  const handleSignUp = () => {
-    if (!email && !password) {
-      showPopup('Please fill out all fields');
-    } else if (!email) {
-      showPopup('Please fill out your email');
-    } else if (!password) {
-      showPopup('Please fill out your password');
-    } else if (email.indexOf('@') < 0 || email.indexOf('.') < 0) {
-      showPopup('Please fill out a valid email');
-    } else if (password.length < 8){
-      showPopup('Please fill out a Password that is at least 8 characters long');
-    } else if ( !(isAllPresent(password)) ){
-      showPopup('A Password should contain at least: both a lowercase and  an uppercase letters, a number and a special character(#$%&*) ');
-    }else if (password !== confirmPassword) {
-      showPopup('Passwords do not match');
-    }
-    
-    
-    //---Query for Email + Phone Number + Passwords---
-   
-    else if( !(find_username) ){
-      showPopup("Email is already taken ")
-    }
-    else if( !(find_password) ){
-      showPopup("Password is already taken ")
-    }
-    else if( !(find_phone_number) ){
-      showPopup("Phone Number is already taken ")
-    }
-    
-    
-
-    else {
-      showPopup(`Account created for: email: ${email} password: ${password},  name: ${name}, phoneNumber: ${phoneNumber}`);
-      
-      let data = {
-
-        id : null,
-        name : name,
-        email : email,
-        phone : phoneNumber,
-        accessLevel: -1,
-        cart: []
-    
-      }
-
-      // Server Implementation
-      
-      
-      //let new_acc = new Account(data);
-      
-      /*
-
-      }
-      */
-
-      //testPostAccount();
-
-    }
   };
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
+// Profile VVVVVVVVVVVV
+  const ProfileScreen = () => {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const colorScheme = useColorScheme();
 
-  return (
-    
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/Trans_TMC_Logo.png')}
-          style={styles.restaurantLogo}
-        />
-      }
-    >
-    <View style={styles.container}>
-    <ThemedText type="title">Sign Up</ThemedText>
+    const colors = {
+      background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
+      placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000',
+      inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',
+      inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000',
+    };
 
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-        placeholder="Name"
-        placeholderTextColor={colors.placeholderText}
-        value={name}
-        onChangeText={setName}
-        secureTextEntry
-      />
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-        placeholder="Phone Number"
-        placeholderTextColor={colors.placeholderText}
-        value={phoneNumber}
-        onChangeText={setNumber}
-        secureTextEntry
-      />
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-        placeholder="Email"
-        placeholderTextColor={colors.placeholderText}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-        placeholder="Password"
-        placeholderTextColor={colors.placeholderText}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-        placeholder="Confirm Password"
-        placeholderTextColor={colors.placeholderText}
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
-      
+    const handleSave = async () => {
 
-      <Button title="Sign Up" onPress={handleSignUp} color={colors.buttonColor} />
+      return;
+    }
 
-      {/* Back to Login Text */}
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.backToLoginText}>Already have an account? Login</Text>
-      </TouchableOpacity>
-
-      {/* Modal for Errors */}
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={toggleModal} // Close modal on backdrop press
-        style={styles.modal}
+    return (
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
+        headerImage={<Image source={require('@/assets/images/Trans_TMC_Logo.png')} style={styles.restaurantLogo} />}
       >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{modalContent}</Text>
-          <Button title="Close" onPress={toggleModal} />
+        <View style={styles.container}>
+          <ThemedText type="title">Profile</ThemedText>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            placeholder="Name"
+            placeholderTextColor={colors.placeholderText}
+            value={name}
+            onChangeText={setName}
+          />
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            placeholder="Email"
+            placeholderTextColor={colors.placeholderText}
+            value={email}
+            onChangeText={setEmail}
+          />
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            placeholder="Phone Number"
+            placeholderTextColor={colors.placeholderText}
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+          />
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            placeholder="Phone Number"
+            placeholderTextColor={colors.placeholderText}
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+          />
+          <Button title="Save Changes" onPress={handleSave} color={colors.background} />
         </View>
-      </Modal>
-    </View>
-    </ParallaxScrollView>
-  );
-};
+      </ParallaxScrollView>
+    );
+  };
 
+// navigation for all pages made
 const AuthScreen = () => {
+  const [loggedIn, setLoggedIn] = useState(false);
+
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        {!loggedIn ? (
+          <>
+            <Stack.Screen name="Login">
+              {(props) => <LoginScreen {...props} setLoggedIn={setLoggedIn} />}
+            </Stack.Screen>
+            <Stack.Screen name="SignUp">
+              {(props) => <SignUpScreen {...props} setLoggedIn={setLoggedIn} />}
+            </Stack.Screen>
+          </>
+        ) : (
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
