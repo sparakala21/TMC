@@ -1,0 +1,39 @@
+name: Server Test Workflow
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - automatedTesting
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start server in background
+        run: |
+          node BackEnd/mongo_functions.js &
+          echo "Waiting for server to be ready..."
+          # Wait for server to be available
+          timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:3000)" != "200" ]]; do sleep 2; done' || false
+
+      - name: Run BackEnd/tests
+        run: node BackEnd/mongo-test-functions.js
+
+      - name: Cleanup
+        run: |
+          # Kill the background server process
+          kill $(lsof -t -i:3000) || true
