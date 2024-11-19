@@ -10,7 +10,7 @@ on:
     types: [opened, reopened]
 
 jobs:
-  Explore-GitHub-Actions:
+  Test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
