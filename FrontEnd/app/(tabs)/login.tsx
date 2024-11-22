@@ -6,34 +6,38 @@ import { createStackNavigator } from '@react-navigation/stack';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import axios from 'axios'
-import { useNavigation } from 'expo-router';
 
 ///Global stuff
   const Stack = createStackNavigator();
 
   const BASE_URL = 'http://localhost:3000';
-  const ACC_URL = '..';
+  const ACC_URL = '../accounts.json';
+  
 
   //Account_info
   let user_id;
 
 //update JSON with
+const fs = require('fs').promises;
   async function updateAccountsJSON(accountId) {
     try {
-      // Read the existing accounts.json file
-      const accountsFilePath = `${ACC_URL}/accounts.json`;
-      const accountsData = await fs.readFile(accountsFilePath, 'utf8');
-      const accounts = JSON.parse(accountsData);
+      // Fetch new account data from API
+      console.log("Account: " + accountId)
+      const find_account = await axios.get(`${BASE_URL}/accounts?_id=${accountId}`);
+      const newAccount = find_account.data.json();
+      //ERR message
+      if (!newAccount) {
+        console.error('No account data found for the given ID.');
+        return;
+      }
   
-      // Add the new account ID to the accounts array
-      accounts.push({ _id: accountId });
-  
-      // Write the updated accounts array back to the file
-      await fs.writeFile(accountsFilePath, JSON.stringify(accounts, null, 2));
-      console.log('Accounts JSON updated successfully');
+      // Replace the file content with the new account data
+      await fs.writeFile(ACC_URL, JSON.stringify(newAccount, null, 2));
+      console.log('Accounts JSON updated successfully!');
     } catch (error) {
       console.error('Error updating accounts JSON:', error);
     }
+  
   }
 
 //LOGIN VVVVVVVVVVV
@@ -79,14 +83,23 @@ import { useNavigation } from 'expo-router';
         if(!!find_account.data){
           showPopup(`Logging into:  ${email}`);
           user_id = find_account.data._id;
+
+          const output = `****${user_id}****\n`;
+          fs.appendFile('../output.txt', output, (err) => {
+              if (err) {
+                  console.error('Error writing to file:', err);
+              } else {
+                  console.log('Output successfully written to ../output.txt');
+              }
+          });
+          
           // Update the JSON file with the user's account ID
           await updateAccountsJSON(user_id);
           //SUCCESSFULL LOGIN!
           
           setLoggedIn(true);
           navigation.replace('Profile');
-          
-        
+
         }
         else if(!!find_email.data){//good Email bad password
           showPopup(`Email found, Password is invalid`)
@@ -253,11 +266,16 @@ import { useNavigation } from 'expo-router';
           password: password,
           accessLevel: 0
         };
+        
+        axios.post(`${BASE_URL}/accounts`, payload);
+        const find_account =  await axios.get(`${BASE_URL}/accounts?email=${email}&password=${password}`)
+        let user_id = find_account.data.items[0]._id;
+        
 
-        await updateAccountsJSON(find_email.data._id);
-        axios.put(BASE_URL, payload);
+        await updateAccountsJSON(user_id);
         showPopup(`Account created for: email: ${email} password: ${password},  name: ${name}, phoneNumber: ${phoneNumber}`);
         }
+        setLoggedIn = true;
         
     };
 
@@ -351,6 +369,7 @@ import { useNavigation } from 'expo-router';
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const colorScheme = useColorScheme();
+
 
     const colors = {
       background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
