@@ -2,8 +2,6 @@ name: Server Test Workflow
 on:
   push:
     branches:
-      - main
-      - develop
       - automatedTesting
   pull_request:
     types: [opened, reopened]
