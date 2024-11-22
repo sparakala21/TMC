@@ -5,8 +5,10 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-import {SquarePaymentsForm} from 'react-square-web-payments-sdk';
-import { submitPayment } from "/BackEnd/action.js";
+import {CreditCard,PaymentForm} from 'react-square-web-payments-sdk';
+import { submitPayment } from "../../action.js";
+const appId = "sandbox-sq0idb-6C_TWTh6OnGyAgGXAsBkqw"
+const locationId = "mainn"
 
 export default function CartScreen() {
  const [isCartModalVisible, setCartModalVisible] = useState(false);
@@ -85,11 +87,15 @@ export default function CartScreen() {
          <Image
            source={require('@/assets/images/6963703.png')}
            style={styles.creditCardLogo} 
+           
          />
                    <PaymentForm
+                   
           applicationId={appId}
           locationId={locationId}
           cardTokenizeResponseReceived={async (token) =>{
+            console.log("AAAAAHHHHHHHH")
+            console.log(token)
             const result = await submitPayment(token.token);
             console.log(result);
           }}
@@ -109,10 +115,7 @@ export default function CartScreen() {
        onRequestClose={closeModalAndNavigate}>
        <View style={styles.modalContainer}>
          <View style={styles.modalContent}>
-           <Image
-             source={require('@/assets/images/grocerybag.png')}
-             style={styles.emptyCartImage}
-           />
+
            <Button title="Add Items to Cart" onPress={closeModalAndNavigate} color="#" />
            <Button title="Complete Order" onPress={openNewModal} color="blue" />
            <Button title="View Payment Options" onPress={closeModal} color="#" />

@@ -22,6 +22,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+//CSP for square
+app.use(function (req, res, next) {
+  res.setHeader(
+    'Content-Security-Policy', "default-src 'self'; connect-src 'self' https://pci-connect.squareupsandbox.com; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; frame-src 'self';"
+  );
+  
+  next();
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
