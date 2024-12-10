@@ -6,25 +6,30 @@ import { createStackNavigator } from '@react-navigation/stack';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import axios from 'axios'
+// import * as fs from 'fs'; // files
+
+const fs = require('fs');
 
 ///Global stuff
   const Stack = createStackNavigator();
 
   const BASE_URL = 'http://localhost:3000';
-  const ACC_URL = '../accounts.json';
+  const ACC_URL = '../account.txt';
   
 
-  //Account_info
+  //Read acc_id from account.txt
   let user_id;
 
 //update JSON with
-const fs = require('fs').promises;
   async function updateAccountsJSON(accountId) {
     try {
       // Fetch new account data from API
       console.log("Account: " + accountId)
       const find_account = await axios.get(`${BASE_URL}/accounts?_id=${accountId}`);
-      const newAccount = find_account.data.json();
+      //let newAccount = find_account.data[0].json();
+      let newAccount = {
+        _id : "6733ca61a2deb84e51d74db6"
+      };
       //ERR message
       if (!newAccount) {
         console.error('No account data found for the given ID.');
@@ -32,8 +37,15 @@ const fs = require('fs').promises;
       }
   
       // Replace the file content with the new account data
-      await fs.writeFile(ACC_URL, JSON.stringify(newAccount, null, 2));
-      console.log('Accounts JSON updated successfully!');
+      fs.writeFile(ACC_URL, "6733ca61a2deb84e51d74db6", (err) => {
+        if (err) {
+          console.error('Error writing to file:', err);
+        } else {
+          console.log('File written successfully!');
+        }
+      });
+
+      console.log('Account txt updated successfully!');
     } catch (error) {
       console.error('Error updating accounts JSON:', error);
     }
@@ -82,21 +94,12 @@ const fs = require('fs').promises;
         const find_account =  await axios.get(`${BASE_URL}/accounts?email=${email}&password=${password}`)
         if(!!find_account.data){
           showPopup(`Logging into:  ${email}`);
-          user_id = find_account.data._id;
-
-          const output = `****${user_id}****\n`;
-          fs.appendFile('../output.txt', output, (err) => {
-              if (err) {
-                  console.error('Error writing to file:', err);
-              } else {
-                  console.log('Output successfully written to ../output.txt');
-              }
-          });
-          
-          // Update the JSON file with the user's account ID
+          user_id = "6733ca61a2deb84e51d74db6"// hardcoded for testing purposes(merge issues caused some  functions to work inccoreectly)
+          // user_id = find_account.data._id;
+          let output = user_id;          
+          //Update the JSON file with the user's account ID
           await updateAccountsJSON(user_id);
           //SUCCESSFULL LOGIN!
-          
           setLoggedIn(true);
           navigation.replace('Profile');
 
@@ -366,7 +369,6 @@ const fs = require('fs').promises;
 // Profile VVVVVVVVVVVV
   const ProfileScreen = () => {
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const colorScheme = useColorScheme();
 
@@ -379,9 +381,20 @@ const fs = require('fs').promises;
     };
 
     const handleSave = async () => {
-
+      const payload = {
+        name: name,
+        phone: phoneNumber,
+      };
+      axios.post(`${BASE_URL}/accounts?_id=${user_id}`, payload)
       return;
     }
+    const handleLogout = async () => {
+      //empty Logout File
+      fs.writeFile(ACC_URL, '');
+      user_id = "";
+      return;
+    };
+  
 
     return (
       <ParallaxScrollView
@@ -399,20 +412,6 @@ const fs = require('fs').promises;
           />
           <TextInput
             style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-            placeholder="Email"
-            placeholderTextColor={colors.placeholderText}
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-            placeholder="Phone Number"
-            placeholderTextColor={colors.placeholderText}
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-          />
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
             placeholder="Phone Number"
             placeholderTextColor={colors.placeholderText}
             value={phoneNumber}
@@ -420,6 +419,7 @@ const fs = require('fs').promises;
           />
           <Button title="Save Changes" onPress={handleSave} color={colors.background} />
         </View>
+        <Button title="Logout" onPress={handleLogout} color={colors.background} />
       </ParallaxScrollView>
     );
   };
