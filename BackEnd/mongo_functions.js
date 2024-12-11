@@ -252,6 +252,29 @@ app.put('/account', async (req, res) => {
     }
 });
 
+async function runSquare(){
+    try {
+        const response = await client.checkoutApi.createPaymentLink({
+          idempotencyKey: '3d8bdeda-ef58-48b0-9cf7-ad44764b8d64',
+          description: 'Thunder Mountain Curry',
+          quickPay: {
+            name: 'Thunder Mountain Curry',
+            priceMoney: {
+              amount: 10000,
+              currency: 'USD'
+            },
+            locationId: 'LAWPABWTGF5CK'
+          }
+        });
+      
+
+        
+        console.log(response.result);
+      } catch(error) {
+        console.log(error);
+      }
+}
+
 
 async function createPickupLocation(newPickupLocation){
     const result = await pickupLocations.insertOne(newPickupLocation.getPostDict());
