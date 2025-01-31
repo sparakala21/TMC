@@ -8,7 +8,7 @@ import { ThemedView } from '@/components/ThemedView';
 import {CreditCard,PaymentForm} from 'react-square-web-payments-sdk';
 import { submitPayment } from "../../action.js";
 const appId = "sandbox-sq0idb-6C_TWTh6OnGyAgGXAsBkqw"
-const locationId = "mainn"
+const locationId = "LAWPABWTGF5CK"
 
 export default function CartScreen() {
  const [isCartModalVisible, setCartModalVisible] = useState(false);
@@ -103,6 +103,17 @@ export default function CartScreen() {
              <CreditCard />
 
           </PaymentForm>
+          <>
+      <Button 
+        border="none"
+        color="pink"
+        height = "200px"
+        onClick={() => submitPayment()}
+        radius = "50%"
+        width = "200px"
+        children = "I'm a pink circle!"
+      />
+    </>
        </ThemedView>
      </ParallaxScrollView>
 
