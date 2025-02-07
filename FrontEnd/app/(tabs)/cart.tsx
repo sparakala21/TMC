@@ -2,6 +2,7 @@ import { Image, StyleSheet, Platform, TouchableOpacity, Linking } from 'react-na
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {submitPayment} from '@/../BackEnd/action.js';
 
 export default function HomeScreen() {
   
@@ -51,7 +52,7 @@ export default function HomeScreen() {
               style={styles.clickableImage}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleFaceBookImagePress}>
+          <TouchableOpacity onPress={submitPayment}>
             <Image
               source={require('@/assets/images/Facebook_Logo_Primary.png')}  // Replace with your image path
               style={styles.clickableImage}
