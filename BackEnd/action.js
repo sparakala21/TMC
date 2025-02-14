@@ -1,20 +1,13 @@
 "use server";
-import { Client } from "square"
-import { SquareClient } from "square";
-const { paymentsApi } = new Client({
-    accessToken: process.env.SQUARE_ACCESS_TOKEN,
-    environment: "sandbox"
+// import { Client } from "square"
+// import { SquareClient } from "square";
+// const { paymentsApi } = new Client({
+//     accessToken: process.env.SQUARE_ACCESS_TOKEN,
+//     environment: "sandbox"
 
 
-});
-
-
-
+// });
 import axios from 'axios';
-
-
-
-
 
 
 export async function submitPayment() {

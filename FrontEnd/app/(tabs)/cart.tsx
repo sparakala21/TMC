@@ -2,9 +2,9 @@ import { Image, StyleSheet, Platform, TouchableOpacity, Linking } from 'react-na
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import {submitPayment} from '@/../BackEnd/action.js';
+import {submitPayment} from '@/action.js';
 
-export default function HomeScreen() {
+export default function HomeScreen() {  
   
   // Function to handle the clickable image
   const handleInstaImagePress = () => {
