@@ -36,7 +36,7 @@ const AdminPage = () => {
   const [menuModalVisible, setMenuModalVisible] = useState(false); // Modal for menu management
   const [newItemModalVisible, setNewItemModalVisible] = useState(false); // Modal for menu management
 
-  const BACKEND_URL = 'http://localhost:3000';
+  const BACKEND_URL = 'https://tmc-85hb.onrender.com';
 
   useEffect(() => {
     fetchMenuItems();

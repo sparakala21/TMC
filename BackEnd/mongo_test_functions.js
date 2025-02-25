@@ -2,9 +2,11 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const assert = require("assert");
 require('dotenv').config();
 //const axios = require('axios');
-const BASE_URL = "http://localhost:3000"
+const BASE_URL = "https://tmc-85hb.onrender.com"
 
 const TEST_DB = 'tmc_uat'
+
+let TOKEN = ""
 
 // Helper function to generate random data for testing
 async function postData(url, inputBody) {
@@ -12,7 +14,8 @@ async function postData(url, inputBody) {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${TOKEN}` // Attach the token to the Authorization header
             },
             body: JSON.stringify(inputBody)
         });
@@ -34,6 +37,9 @@ async function fetchData(url, query="") {
     try {
         const response = await fetch(url, {
             method: 'GET', 
+            headers: {
+                'Authorization': `Bearer ${TOKEN}` // Attach the token to the Authorization header
+              }
         });
 
         if (!response) {
@@ -55,7 +61,8 @@ async function updateData(url, inputBody) {
         const response = await fetch(url, {
             method: 'PUT', // Use PUT method for updating data
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${TOKEN}` // Attach the token to the Authorization header
             },
             body: JSON.stringify(inputBody)
         });
@@ -497,6 +504,20 @@ async function testOrderFromCartnWithBadId(){
     assert.strictEqual(result.error, "Invalid _id format" )
 }
 
+async function testLogin(){
+    const url = BASE_URL + "/login"
+    let account = await setUpTestAccount()
+    body = {
+        email : "theTester@test.com",
+        password : "12345"
+    }
+    let result = await postData(url, body);
+    assert.notDeepEqual(result["token"], "")
+    return result["token"]
+
+}
+
+
 async function clearTestDB(){
     const uri = process.env.ATLAS_URI
 
@@ -524,7 +545,8 @@ async function clearTestDB(){
 async function runTests(){
     // We only want to run the tests on the test database 
     assert.strictEqual(process.env.DATABASE, TEST_DB)
-
+    TOKEN = await testLogin()
+    
     await testPostMenuItem()
     await testPostEmptyMenuItem()
     await testPostIncompleteMenuItem()
@@ -555,6 +577,7 @@ async function runTests(){
 
     await testOrderFromCart() 
     await testOrderFromCartnWithBadId()
+
     console.log("all tests passed")
     //await clearTestDB()
 }

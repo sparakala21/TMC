@@ -8,7 +8,7 @@ import { useIsFocused, useNavigation, NavigationContainer } from '@react-navigat
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 
-const BACKEND_URL = 'http://localhost:3000';
+const BACKEND_URL = 'https://tmc-85hb.onrender.com';
 
 // MenuItem object
 const MenuItem = ({ itemId, itemName, itemDescription, itemPrice, itemImage, itemAllergen, onQuantityChange, quantities }) => (

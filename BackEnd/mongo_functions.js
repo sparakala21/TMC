@@ -2,6 +2,7 @@
 const { MenuItem, Order, Account, PickupLocation } = require("./models.js")
 const { MongoClient, ServerApiVersion, ObjectId  } = require("mongodb");
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const express = require('express');
 
@@ -35,6 +36,39 @@ const menuItems = myDB.collection("menuItems");
 const orders = myDB.collection("orders");
 const accounts = myDB.collection("accounts");
 const pickupLocations = myDB.collection("pickupLocations");
+
+
+// for logging in the user
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    let user = await getAllAccounts({"email": email, "password": password})
+    // the found accounts will be in a list
+    if (user.length > 0){
+        user = user[0]
+    }
+    if (!user) return res.status(400).json({ message: 'User not found' });
+
+    const isMatch = password == user["password"] 
+
+    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+
+    const token = jwt.sign({ userId: user["_id"] }, 'your_jwt_secret', { expiresIn: '1h' });
+
+    res.json({ token });
+});
+
+
+const authenticateJWT = (req, res, next) => {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return res.status(403).json({ message: 'Access denied' });
+
+    jwt.verify(token, 'your_jwt_secret', (err, user) => {
+        if (err) return res.status(403).json({ message: 'Invalid token' });
+        req.user = user;
+        next();
+    });
+};
+
 
 async function postMenuItems(body){
     const result = await menuItems.insertOne(body);
@@ -469,6 +503,7 @@ app.post('/orderFromCart', async(req, res) => {
     }
 
 })
+
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
