@@ -2,7 +2,7 @@ import { Image, StyleSheet, Platform, TouchableOpacity, Linking } from 'react-na
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import {submitPayment} from '@/action.js';
+import {submitPayment} from '../../action.js';
 
 export default function HomeScreen() {  
   

@@ -10,7 +10,7 @@
 import axios from 'axios';
 
 
-export async function submitPayment() {
+export async function submitPayment() {       
     const headers = {
 
         'Authorization': `Bearer EAAAl7bENyO2IwLTbpGL89p7qWt6p1A6C6AXjph8GtfoeYievQUUrespkltM-hh3`, //make more secure use env
@@ -47,7 +47,7 @@ export async function submitPayment() {
       };
     
     
-    
+      console.log("function is run")
       try {
     
         const response = await axios.post('https://connect.squareupsandbox.com/v2/online-checkout/payment-links', data, { headers });
