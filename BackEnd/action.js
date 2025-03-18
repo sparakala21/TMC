@@ -17,7 +17,8 @@ export async function submitPayment() {
     
         'Square-Version': '2025-01-23', 
     
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
     
       };
     
@@ -50,7 +51,7 @@ export async function submitPayment() {
       console.log("function is run")
       try {
     
-        const response = await axios.post('https://connect.squareupsandbox.com/v2/online-checkout/payment-links', data, { headers });
+        const response = await axios.post('https://connect.squareupsandbox.com/v2/online-checkout/payment-links', data,  headers );
     
         console.log("Quick Pay link created:", response.data.payment_link.url);
     
