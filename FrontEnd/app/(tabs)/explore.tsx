@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { CartProvider } from '../components/CartContext';
 import { useCart } from '../components/CartContext';
+import { useAuth} from '../components/AuthContext';
 
 const BACKEND_URL = 'https://tmc-85hb.onrender.com';
 
@@ -53,11 +54,59 @@ const MenuItem = ({ itemId, itemName, itemDescription, itemPrice, itemImage, ite
 export default function MenuScreen() {
   const [menuItems, setMenuItems] = useState([]);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const navigation = useNavigation();
   const [categorizedItems, setCategorizedItems] = useState({
     appetizers: [],
     mainDishes: [],
     desserts: []
   });
+
+  //API context
+  const { user, loggedIn } = useAuth();
+  const {setCartFromAccount} = useCart();
+
+  //MODAL to login
+  const loginModal = () => {
+    return (
+      <Modal
+        visible={showLoginModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowLoginModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ThemedText style={styles.modalText}>Please log in to proceed to checkout.</ThemedText>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setShowLoginModal(false);
+                // Optional: Navigate to login screen
+                navigation.navigate('login');
+              }}
+            >
+              <Text style={styles.modalButtonText}>Go to Login</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalCancelButton}
+              onPress={() => setShowLoginModal(false)}
+            >
+              <Text style={styles.modalCancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  //On Open if logged in pull cart from backend
+  if(loggedIn){
+    let cart = useState(user?.cart || []);
+    setCartFromAccount(cart);
+  } 
+  //TO Add in future potentially.
+  //switching pages and not closing app, store cart_context in backend only if user is loggedIn.
 
   // Used to connect to backend database
   useEffect(() => {
@@ -101,8 +150,15 @@ export default function MenuScreen() {
     // Navigation to cart/checkout page
     const closeAndNavigate = () => 
     {
+      if(loggedIn){
       onClose();
+      //push to backend VVVVVVVVVVVVVVVVVV
       navigation.navigate('cart');
+      } else{
+        //bring up MODAL 
+        onClose();
+        setShowLoginModal(true);
+      }
     };
 
     // Calculate totals from cart data
@@ -192,6 +248,9 @@ export default function MenuScreen() {
           isVisible={isSidebarVisible}
         />
       )}
+
+      {/* Login Modal */}
+      {loginModal()}
 
       {/* Menu Section */}
       <View style={[styles.contentContainer, { marginRight: isSidebarVisible }]}>
@@ -504,6 +563,46 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#e5dccf',
-  }
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 30,
+    width: '80%',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#FFA726',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  modalButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalCancelButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  modalCancelText: {
+    color: '#444',
+    fontSize: 16,
+  }  
 
 });

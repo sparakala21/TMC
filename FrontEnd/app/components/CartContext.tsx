@@ -62,6 +62,7 @@ export function CartProvider({ children }: CartProviderProps) {
                 })
             }
         })
+        
     }
 
     function removeFromCart(id: string) {
@@ -69,8 +70,36 @@ export function CartProvider({ children }: CartProviderProps) {
             return currItems.filter(items => items.id !== id)
         })
     }
+
+    function setCartFromAccount(AccountCart: Array<Object>) {
+        AccountCart.forEach((item) => {
+            let acc_id = item.id;
+            let acc_name = item.name;
+            increaseCartQuantity(acc_id , acc_name);
+        });
+    }
+
+    function cartToAPIPost(){
+        let output = [];
+        let temp_item;
+        const [cartItems] = useState<CartItem[]>([]);
+        cartItems.forEach((item)=> {
+            for(let i = 0; i < item.quantity; i++){
+                temp_item = item;
+                temp_item;
+                if ('quantitiy' in temp_item){
+                    delete temp_item.quantity;
+                }
+                output.push(temp_item);
+            }
+        })
+        return output;
+    }
+
+
+
     return (
-    <CartContext.Provider value= {{getItemQuantity, increaseCartQuantity, decreaseCartQuantity, removeFromCart, cartItems}}>
+    <CartContext.Provider value= {{getItemQuantity, increaseCartQuantity, decreaseCartQuantity, removeFromCart, cartItems, setCartFromAccount, cartToAPIPost}}>
         {children}
     </CartContext.Provider>
     )

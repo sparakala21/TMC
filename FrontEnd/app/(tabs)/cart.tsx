@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Image, 
   StyleSheet, 
@@ -12,16 +12,14 @@ import {
   Platform,
   ScrollView
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import { CartProvider } from '../components/CartContext';
-import { useCart } from '../components/CartContext';
+import { CartProvider, useCart } from '../components/CartContext';
+import { useAuth } from '../components/AuthContext';
 
 const BACKEND_URL = 'https://tmc-85hb.onrender.com';
 
@@ -53,40 +51,39 @@ const PaymentButton = ({
 // Cart Screen Component
 function CartScreen() {
   const [menuItems, setMenuItems] = useState([]);
-      // Calculate cart total
-      const { cartItems, removeFromCart } = useCart();
-      const subtotal = cartItems.reduce((total, item) => {
-      const menuItem = menuItems.find(menu => menu._id === item.id);
-      return total + (menuItem?.price * item.quantity);
-    }, 0);
-    const tax = subtotal * 0.08875; // NYS 8.875% tax rate
-    const total = subtotal + tax;
+  const { cartItems, removeFromCart } = useCart();
+  const { cartToAPIPost, user } = useAuth();
+  const subtotal = cartItems.reduce((total, item) => {
+    const menuItem = menuItems.find(menu => menu._id === item.id);
+    return total + (menuItem?.price * item.quantity);
+  }, 0);
+  const tax = subtotal * 0.08875; // NYS 8.875% tax rate
+  const total = subtotal + tax;
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isCartModalVisible, setCartModalVisible] = useState(false);
   const [isNewModalVisible, setIsNewModalVisible] = useState(false);
+  const [loginModalVisible, setLoginModalVisible] = useState(!user);
   const [isPaymentMethodModalVisible, setIsPaymentMethodModalVisible] = useState(false);
   const [isPaymentConfirmationModalVisible, setIsPaymentConfirmationModalVisible] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
   const isFocused = useIsFocused();
   const navigation = useNavigation();
-  const url = 'http://localhost:3000';
+  
 
+
+
+//condition to show optional login prompt
   useEffect(() => {
     const loadMenuItems = async () => {
-      try 
-      {
+      try {
         console.log('Fetching from:', `${BACKEND_URL}/menuItems`);
         const response = await axios.get(`${BACKEND_URL}/menuItems`);
         console.log('Response data:', response.data);
         const items = Array.isArray(response.data.foundItems) ? response.data.foundItems : [];
         setMenuItems(items);
-      } 
-
-      catch (error) 
-      {
-        console.error('Error fetching menu items:', 
-        {
+      } catch (error) {
+        console.error('Error fetching menu items:', {
           message: error.message,
           responseData: error.response?.data,
           fullError: error
@@ -104,6 +101,13 @@ function CartScreen() {
       setCartModalVisible(false);
     }
   }, [isFocused]);
+  // If the user is not logged in, show the login modal
+  useEffect(() => {
+    // Check if the user is not logged in and the screen is focused
+    if (!user && isFocused) {
+      setLoginModalVisible(true);
+    }
+  }, [user, isFocused]);
 
   const closeModal = () => {
     setCartModalVisible(false);
@@ -179,16 +183,14 @@ function CartScreen() {
       paymentLink.href = data.paymentUrl;
       paymentLink.textContent = 'Proceed to Payment';
       paymentLink.className = 'payment-link';
-      paymentLink.target = '_blank'; // Open in new tab
-      paymentLink.rel = 'noopener noreferrer'; // Security best practice
+      paymentLink.target = '_blank';
+      paymentLink.rel = 'noopener noreferrer';
   
-      // Optional: Append to a specific container or replace existing content
       const paymentContainer = document.getElementById('payment-container');
       if (paymentContainer) {
         paymentContainer.innerHTML = ''; 
         paymentContainer.appendChild(paymentLink);
       } else {
-        // Fallback to direct navigation if no container found
         window.location.href = data.paymentUrl;
       }
     } catch (error) {
@@ -203,55 +205,41 @@ function CartScreen() {
   }
 
   // Sidebar component in MenuScreen
-  const Sidebar = ({ isVisible, onClose }) => 
-  { 
+  const Sidebar = ({ isVisible, onClose }) => { 
     const navigation = useNavigation();
-
-    const handlePayNow = () => {
-      setCurrentView('payment');
-    };
-
-    const handleBackToOrder = () => {
-      setCurrentView('cart');
-    };
 
     return (
       <Modal transparent={true} animationType="slide" visible={isVisible}>
         <View style={styles.overlay}>
           <View style={styles.sidebarContainer}>
-
-          {/* Sidebar text */}
             <ThemedText style={styles.sidebarTitle}>Your Cart</ThemedText>
             <ScrollView showsVerticalScrollIndicator={false}>
               {cartItems.length > 0 ? (
                 cartItems.map((item) => {
                   const menuItem = menuItems.find(menu => menu._id === item.id);
-                  return(
-                  <View key={item.id} style={styles.cartItemContainer}>
-                    <View style={styles.cartItemDetails}>
-                      <ThemedText style={styles.item}>
-                        {item.quantity}x {item.name}
-                      </ThemedText>
-                      <ThemedText style={styles.cartItemPrice}>
-                        ${((menuItem?.price || 0) * item.quantity).toFixed(2)}
-                      </ThemedText>
+                  return (
+                    <View key={item.id} style={styles.cartItemContainer}>
+                      <View style={styles.cartItemDetails}>
+                        <ThemedText style={styles.item}>
+                          {item.quantity}x {item.name}
+                        </ThemedText>
+                        <ThemedText style={styles.cartItemPrice}>
+                          ${((menuItem?.price || 0) * item.quantity).toFixed(2)}
+                        </ThemedText>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.removeButton}
+                        onPress={() => removeFromCart(item.id)}
+                      >
+                        <Icon name="trash" size={20} color="#FF0000" />
+                      </TouchableOpacity>
                     </View>
-                    <TouchableOpacity
-                          style={styles.removeButton}
-                          onPress={() => removeFromCart(item.id)}
-                    >
-                      <Icon name="trash" size={20} color="#FF0000" />
-                    </TouchableOpacity>
-                  </View>
-                );
-              })
+                  );
+                })
               ) : (
                 <ThemedText>No items in the cart.</ThemedText>
               )}
-
               <View style={styles.divider} />
-              
-              {/* Sidebar calculations for the total */}
               <View style={styles.totalsContainer}>
                 <ThemedText>Subtotal: ${subtotal.toFixed(2)}</ThemedText>
                 <ThemedText>Tax: ${tax.toFixed(2)}</ThemedText>
@@ -259,34 +247,32 @@ function CartScreen() {
                   Total: ${total.toFixed(2)}
                 </ThemedText>
               </View>
-              
               <View style={styles.bottomPadding} />
             </ScrollView>
-
-            {/* Sidebar buttons */}
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <ThemedText style={styles.closeButtonText}>X</ThemedText>
             </TouchableOpacity>
-
             <View style={styles.buttonWrapper}>
               <TouchableOpacity 
-                  style={styles.backButton}
-                  onPress={() => {
-                    closeSidebar();
-                    backToCheckoutOptions();
-                  }}
-                >
-                  <Text style={styles.buttonText}>Back to Checkout Options</Text>
+                style={styles.backButton}
+                onPress={() => {
+                  closeSidebar();
+                  backToCheckoutOptions();
+                }}
+              >
+                <Text style={styles.buttonText}>Back to Checkout Options</Text>
               </TouchableOpacity>
-
               <TouchableOpacity 
-                  style={styles.payButton}
-                  onPress={() => {
-                    closeSidebar();
-                    openPaymentModal();
-                  }}
-                >
-                  <Text style={styles.buttonText}>Pay Now</Text>
+                style={styles.payButton}
+                onPress={() => {
+                  // MAKE CHANGES HERE
+                  let api_post = cartToAPIPost(user.cart);
+                  axios.post();
+                  closeSidebar();
+                  openPaymentModal();
+                }}
+              >
+                <Text style={styles.buttonText}>Pay Now</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -295,9 +281,9 @@ function CartScreen() {
     );
   };
 
-// Divider component (just a bold horizontal line)
+  // Divider component
   const Divider = () => (
-  <View style={styles.divider} />
+    <View style={styles.divider} />
   );
 
   const closePaymentMethodModal = () => {
@@ -308,8 +294,8 @@ function CartScreen() {
   return (
     <ThemedView style={{ flex: 1 }}>
       <Sidebar 
-      isVisible={isSidebarVisible} 
-      onClose={closeSidebar} 
+        isVisible={isSidebarVisible} 
+        onClose={closeSidebar} 
       />
       <ParallaxScrollView
         headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
@@ -346,7 +332,7 @@ function CartScreen() {
         </ThemedView>
       </ParallaxScrollView>
 
-      {/* Modal for options when checking out */}
+      {/* Modal for checkout options */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -356,14 +342,12 @@ function CartScreen() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>Checkout Options</Text>
-            
             <TouchableOpacity 
               onPress={closeModalAndNavigate}
               style={[styles.touchableButton, { backgroundColor: 'red' }]}
             >
               <Text style={styles.buttonText}>Add Items to Cart</Text>
             </TouchableOpacity>
-
             <TouchableOpacity 
               onPress={() => {
                 closeModal();
@@ -373,7 +357,6 @@ function CartScreen() {
             >
               <Text style={styles.buttonText}>Complete Order</Text>
             </TouchableOpacity>
-
             <TouchableOpacity 
               onPress={closeModal}
               style={[styles.touchableButton, { backgroundColor: 'gray' }]}
@@ -394,7 +377,6 @@ function CartScreen() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>Select Payment Method</Text>
-            
             <View style={styles.paymentButtonsContainer}>
               <PaymentButton
                 onPress={() => {
@@ -433,16 +415,13 @@ function CartScreen() {
                 testID="credit-card-button"
               />
             </View>
-            
             <Text style={styles.totalTextCheckout}>Total: ${total.toFixed(2)}</Text>
-            
             <TouchableOpacity 
               style={[styles.touchableButton, styles.backButton1]} 
               onPress={backtoOrderTotal}
             >
               <Text style={styles.buttonText1}>Back to Order Total</Text>
             </TouchableOpacity>
-            
             <TouchableOpacity
               style={[
                 styles.touchableButton, 
@@ -454,7 +433,6 @@ function CartScreen() {
             >
               <Text style={styles.buttonText1}>Complete Payment</Text>
             </TouchableOpacity>
-            
             <TouchableOpacity 
               style={[styles.touchableButton, styles.payButton1, { backgroundColor: '#FF3B30' }]} 
               onPress={closePaymentMethodModal}
@@ -480,7 +458,6 @@ function CartScreen() {
             <Text style={styles.modalSubtitle}>Payment Method: {selectedPaymentMethod}</Text>
             <Text style={styles.modalSubtitle}>Date: {new Date().toLocaleDateString()}</Text>
             <Text style={styles.modalSubtitle}> </Text>
-            
             <Image source={require('@/assets/images/TMC_Logo.png')} style={styles.tmcLogo} />
             <Text style={[styles.modalSubtitle, styles.successMessage]}>
               Payment Successful! Thank you for your order.
@@ -488,7 +465,6 @@ function CartScreen() {
             <Text style={styles.modalSubtitle}>
               Your order will be ready for pickup in approximately 15-20 minutes.
             </Text>
-            
             <TouchableOpacity 
               onPress={handleDone}
               style={styles.doneButton}
@@ -499,15 +475,33 @@ function CartScreen() {
           </View>
         </View>
       </Modal>
+      {/* Login Modal */}
+      {!user && (
+        <Modal visible={loginModalVisible} transparent={true} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>Please log in to access your cart.</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setLoginModalVisible(false);  // Close the modal
+                  navigation.navigate('login');  // Navigate to login screen
+                }}
+                style={[styles.touchableButton, { backgroundColor: '#007AFF' }]}
+              >
+                <Text style={styles.buttonText}>Go to Login</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+)}
     </ThemedView>
   );
 }
 
 // Create a stack navigator
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
-
-// Remove the NavigationContainer wrapper
 export default function CartNavigator() {
   return (
     <Stack.Navigator>
