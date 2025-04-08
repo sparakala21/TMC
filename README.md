@@ -3,13 +3,6 @@
 
 This guide will walk you through setting up WSL, installing Git, cloning the Thunder Mountain Curry (TMC) repository, setting up Node.js, and installing the project dependencies.
 
-
-
-
-
-
-
-
 ## 1. Cloning the TMC Repository
 
 Now that Git is installed, you can clone the TMC repository from GitHub.
@@ -50,3 +43,6 @@ Make sure you have the .env file with ```ATLAS_URI``` set and also have ```DATAB
 Note: the database must be set to 'tmc_uat' in order to run the test
 
 In the BackEnd folder run ```node mongo_functions.js``` to start the server. Then from another terminal run ```node mongo_test_functions.js ```
+
+
+
