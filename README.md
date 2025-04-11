@@ -45,4 +45,7 @@ Note: the database must be set to 'tmc_uat' in order to run the test
 In the BackEnd folder run ```node mongo_functions.js``` to start the server. Then from another terminal run ```node mongo_test_functions.js ```
 
 
-
+## Things needed to Make this your own
+## hardcoded: immages, social media
+cart.tsx
+index.tsx

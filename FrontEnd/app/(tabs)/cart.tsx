@@ -2,16 +2,18 @@ import { Image, StyleSheet, Platform, TouchableOpacity, Linking } from 'react-na
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { LearnMoreLinks } from 'react-native/Libraries/NewAppScreen';
+const Links = require("links.json");
 
 export default function HomeScreen() {
   
   // Function to handle the clickable image
   const handleInstaImagePress = () => {
-    Linking.openURL('https://www.instagram.com/thundermountaincurry/');  // Replace with your actual link
+    Linking.openURL(Links.Instagram); 
   };
 
   const handleFaceBookImagePress = () => {
-    Linking.openURL('https://www.facebook.com/thundermountaincurry');  // Replace with your actual link
+    Linking.openURL(Links.Facebook);  
   };
 
   return (
