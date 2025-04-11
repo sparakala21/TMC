@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, TextInput, View, Button, Text, TouchableOpacity, Image, useColorScheme } from 'react-native';
 import Modal from 'react-native-modal';
-import { NavigationContainer } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -58,7 +58,7 @@ const LoginScreen = ({ navigation }) => {
           
           // SUCCESSFUL LOGIN! - Fixed to set user data and logged in state separately
           console.log(find_account.data);
-          setUser(find_account.data.foundItems[0]); // Use the first account in search(More than one with test accounts)
+          setUser(find_account.data.foundItems[0]); // Use the first account in search (more than one with test accounts)
           setLoggedIn(true);
           navigation.replace('Profile');
         }
@@ -145,6 +145,10 @@ const SignUpScreen = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [phoneNumber, setNumber] = useState('');
+
+  // State variables to control password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Modal state
   const [isModalVisible, setModalVisible] = useState(false);
@@ -242,6 +246,8 @@ const SignUpScreen = ({ navigation }) => {
     setModalVisible(!isModalVisible);
   };
 
+  
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
@@ -278,22 +284,34 @@ const SignUpScreen = ({ navigation }) => {
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-          placeholder="Password"
-          placeholderTextColor={colors.placeholderText}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-          placeholder="Confirm Password"
-          placeholderTextColor={colors.placeholderText}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-        />
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            placeholder="Password"
+            placeholderTextColor={colors.placeholderText}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Text style={styles.showHideText}>{showPassword ? 'Hide' : 'Show'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            placeholder="Confirm Password"
+            placeholderTextColor={colors.placeholderText}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirmPassword}
+          />
+          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Text style={styles.showHideText}>{showConfirmPassword ? 'Hide' : 'Show'}</Text>
+          </TouchableOpacity>
+        </View>
         
         <Button title="Sign Up" onPress={handleSignUp} color={colors.buttonColor} />
 
@@ -318,19 +336,19 @@ const SignUpScreen = ({ navigation }) => {
   );
 };
 
-// PROFILE SCREEN
-const ProfileScreen = () => {
+// PROFILE SCREEN - UPDATED
+const ProfileScreen = ({ navigation }) => { 
   const { user, logout } = useAuth();
   const [name, setName] = useState(user?.name || '');
   const [phoneNumber, setPhoneNumber] = useState(user?.phone || '');
   
   const colorScheme = useColorScheme();
-
   const colors = {
     background: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
     placeholderText: colorScheme === 'dark' ? '#BDBDBD' : '#000000',
     inputBackground: colorScheme === 'dark' ? '#333' : '#FFF',
     inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000',
+    headerColor: colorScheme === 'dark' ? '#FF7043' : '#FFA726',
   };
 
   const handleSave = async () => {
@@ -345,6 +363,9 @@ const ProfileScreen = () => {
       console.error('Failed to save changes', error);
     }
   };
+  const admin = () => {
+    navigation.navigate('AdminPage');
+  }
 
   if (!user) {
     return <Text>Loading...</Text>;
@@ -357,22 +378,50 @@ const ProfileScreen = () => {
     >
       <View style={styles.container}>
         <ThemedText type="title">Profile</ThemedText>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-          placeholder="Name"
-          placeholderTextColor={colors.placeholderText}
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-          placeholder="Phone Number"
-          placeholderTextColor={colors.placeholderText}
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-        />
+        
+        <View style={styles.fieldRow}>
+          <Text style={[styles.fieldLabel, {color: colors.headerColor}]}>Current Name: {user.name}</Text>
+          <TextInput
+            style={[styles.fieldInput, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter New Name"
+            placeholderTextColor={colors.placeholderText}
+          />
+        </View>
+        
+        <View style={styles.fieldRow}>
+          <Text style={[styles.fieldLabel, {color: colors.headerColor}]}>Current Email: {user.email}</Text>
+          <TextInput
+            style={[styles.fieldInput, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            value={user.email}
+            editable={false}
+            placeholder="Email cannot be changed"
+            placeholderTextColor={colors.placeholderText}
+          />
+        </View>
+        
+        <View style={styles.fieldRow}>
+          <Text style={[styles.fieldLabel, {color: colors.headerColor}]}>Current Phone: {user.phone}</Text>
+          <TextInput
+            style={[styles.fieldInput, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            placeholder="Enter New Phone Number"
+            placeholderTextColor={colors.placeholderText}
+          />
+        </View>
+        
         <Button title="Save Changes" onPress={handleSave} color={colors.background} />
-        <Button title="Logout" onPress={logout} color={colors.background} style={{ marginTop: 20 }} />
+        <View style={styles.buttonSpacer}>
+          <Button title="Logout" onPress={logout} color={colors.background} />
+        </View>
+        
+        {user.accessLevel === 1 && (
+          <View style={styles.buttonSpacer}>
+            <Button title="ADMIN ACCESS" onPress={admin} color={colors.background} />
+          </View>       
+         )}
       </View>
     </ParallaxScrollView>
   );
@@ -384,18 +433,23 @@ const NavigateLoggedIn = () => {
 
   return (
     <Stack.Navigator>
-      {!loggedIn ? (
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
-        </>
-      ) : (
+    {!loggedIn ? (
+      <>
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+      </>
+    ) : (
+      <>
         <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
-      )}
-    </Stack.Navigator>
+        <Stack.Screen name="AdminPage" 
+          component={require('../components/adminpage').default} 
+          options={{ headerShown: true, title: 'Admin Panel' }} 
+        />
+      </>
+    )}
+  </Stack.Navigator>
   );
 };
-
 
 // Main component that provides the Auth context
 export default function AuthScreen(){
@@ -467,5 +521,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
+  // Updated styles for Profile fields layout
+  fieldRow: {
+    flexDirection: 'column',
+    marginBottom: 15,
+  },
+  fieldLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  fieldInput: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    fontSize: 16,
+  },
+  buttonSpacer: {
+    marginTop: 20,
+  },
 });
-

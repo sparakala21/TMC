@@ -100,9 +100,9 @@ export default function MenuScreen() {
     );
   };
 
+  let cart = useState(user?.cart || []);
   //On Open if logged in pull cart from backend
   if(loggedIn){
-    let cart = useState(user?.cart || []);
     setCartFromAccount(cart);
   } 
   //TO Add in future potentially.

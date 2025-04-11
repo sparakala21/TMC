@@ -5,29 +5,18 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DefaultTheme, DarkTheme, ThemeProvider } from '@react-navigation/native';
-import { useAuth } from '../components/AuthContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { user, loggedIn } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-  
-  useEffect(() => {
-    // Check if user exists and has admin role
-    if (user && user.role === 'admin') {
-      setIsAdmin(true);
-    } else {
-      setIsAdmin(false);
-    }
-  }, [user]);
 
+  
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
           tabBarStyle: {
-            backgroundColor: colorScheme === 'dark' ? '#000' : '#fff', // Black in dark mode, white in light mode
+            backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
           },
           headerShown: false,
         }}
@@ -68,18 +57,7 @@ export default function TabLayout() {
             ),
           }}
         />
-        {isAdmin && (
-          <Tabs.Screen
-            name="adminpage"
-            options={{
-              title: 'Admin',
-              tabBarIcon: ({ color, focused }) => (
-                <TabBarIcon name={focused ? 'settings' : 'settings-outline'} color={color} />
-              ),
-              lazy: true,
-            }}
-          />
-        )}
+        
       </Tabs>
     </ThemeProvider>
   );
