@@ -2,17 +2,17 @@ import { Image, StyleSheet, Platform, TouchableOpacity, Linking } from 'react-na
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-const links = require("links.json");
+const Links = require("links.json");
 
 export default function HomeScreen() {
   
   // Function to handle the clickable image
   const handleInstaImagePress = () => {
-    Linking.openURL(links.Instagram);  // Replace with your actual link
+    Linking.openURL(Links.Instagram);  // Replace with your actual link
   };
 
   const handleFaceBookImagePress = () => {
-    Linking.openURL(links.FaceBook);  // Replace with your actual link
+    Linking.openURL(Links.FaceBook);  // Replace with your actual link
   };
 
   return (
@@ -20,7 +20,7 @@ export default function HomeScreen() {
       headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
       headerImage={
         <Image
-          source={require('@/assets/images/Trans_TMC_Logo.png')}
+          source={require('@/assets/images/'+Links.tranparent_logo)}
           style={styles.restaurantLogo}
         />
       }>

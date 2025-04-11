@@ -4,6 +4,8 @@ import axios from 'axios';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { LearnMoreLinks } from 'react-native/Libraries/NewAppScreen';
+const Links = require("links.json");
 
 interface MenuItem {
   _id: string;
@@ -138,7 +140,7 @@ const AdminPage = () => {
         headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
         headerImage={
           <Image
-            source={require('@/assets/images/Trans_TMC_Logo.png')}
+            source={require('@/assets/images/'+Links.tranparent_logo)}
             style={styles.restaurantLogo}
           />
         }>

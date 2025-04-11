@@ -47,5 +47,17 @@ In the BackEnd folder run ```node mongo_functions.js``` to start the server. The
 
 ## Things needed to Make this your own
 ## hardcoded: immages, social media
-cart.tsx
-index.tsx
+
+Key File: Links.json
+
+Please go into links.Json and provide links to your Instagram Page and Facebook Page
+Upload a Transparent Logo, and a regular Logo and record the file names into links.json
+
+Key File: cart.tsx
+cart.tsx has text that nees to be changed to describe your food experience. Please include:
+Our Story: a quick description of your origins or that of the restauraunt
+Our Food: a short description of the food, flavors, and/or ingredients
+Visit us: Where are you located, a verbal description of locations mentioning landmarks and local highlights
+
+
+
