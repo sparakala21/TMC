@@ -22,7 +22,7 @@ interface MenuItemFormData {
   description: string;
 }
 
-const AdminPage = () => {
+const AdminPage = ({ navigation }) => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [newMenuItem, setNewMenuItem] = useState<MenuItemFormData>({ 
     name: '', 
@@ -101,12 +101,10 @@ const AdminPage = () => {
   };
 
   const resetForm = () => {
-    setNewMenuItem({ name: '', price: 0, allergen: '',category: '', description: '' });
+    setNewMenuItem({ name: '', price: 0, allergen: '', category: '', description: '' });
     setEditMode(false);
     setSelectedItem(null);
   };
-
-
 
   const selectItemForEditing = (item: MenuItem) => {
     setNewItemModalVisible(true)
@@ -119,7 +117,11 @@ const AdminPage = () => {
       category: item.category,
       description: item.description 
     });
-    
+  };
+
+  // Function to navigate back to Profile
+  const goBackToProfile = () => {
+    navigation.navigate('Profile');
   };
 
   const colorScheme = useColorScheme(); 
@@ -132,104 +134,115 @@ const AdminPage = () => {
     inputTextColor: colorScheme === 'dark' ? '#FFF' : '#000', 
   };
 
-
   return (
-      <ParallaxScrollView
-        headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
-        headerImage={
-          <Image
-            source={require('@/assets/images/Trans_TMC_Logo.png')}
-            style={styles.restaurantLogo}
-          />
-        }>
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: '#FFA726', dark: '#FF7043' }}
+      headerImage={
+        <Image
+          source={require('@/assets/images/Trans_TMC_Logo.png')}
+          style={styles.restaurantLogo}
+        />
+      }>
 
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Admin Page</ThemedText>
-        </ThemedView>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Admin Page</ThemedText>
+      </ThemedView>
 
-        <Button title="Manage Menu" onPress={() => setMenuModalVisible(true)} color={colors.buttonColor}/>
+      {/* Back to Profile button */}
+      <Button 
+        title="Back to Profile" 
+        onPress={goBackToProfile} 
+        color={colors.buttonColor}
+      />
 
-        <Modal visible={menuModalVisible} transparent={true} animationType="slide">
-          <ThemedView style={styles.modalContainer}>
-            <ThemedView style={styles.modalContent}>
-              <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">Menu Changes</ThemedText>
-              </ThemedView>
-              <Button title="Add New Menu" onPress={() => setNewItemModalVisible(true)} color={colors.buttonColor}/>
-              <Modal visible={newItemModalVisible} transparent={true} animationType="slide">
-                <View style={styles.modalContainer}>
-                  <View style={styles.modalContent}>
-                    <ThemedView style={styles.titleContainer}>
-                      <ThemedText type="title">New/Edit Item</ThemedText>
-                    </ThemedView>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-                      placeholder="Name"
-                      placeholderTextColor={colors.placeholderText}
-                      value={newMenuItem.name}
-                      onChangeText={(text) => setNewMenuItem({...newMenuItem, name: text})}
-                      autoCapitalize="none"
-                    />
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-                      placeholder="Price"
-                      placeholderTextColor={colors.placeholderText}
-                      value={newMenuItem.price ? String(newMenuItem.price) : ''}
-                      onChangeText={(text) => setNewMenuItem({...newMenuItem, price: parseFloat(text) || 0})}
-                      keyboardType="decimal-pad"
-                      autoCapitalize="none"
-                    />
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-                      placeholder="Allergen"
-                      placeholderTextColor={colors.placeholderText}
-                      value={newMenuItem.allergen}
-                      onChangeText={(text) => setNewMenuItem({...newMenuItem, allergen: text})}
-                      autoCapitalize="none"
-                    />
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-                      placeholder="Category"
-                      placeholderTextColor={colors.placeholderText}
-                      value={newMenuItem.category}
-                      onChangeText={(text) => setNewMenuItem({...newMenuItem, category: text})}
-                      autoCapitalize="none"
-                    />
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
-                      placeholder="Description"
-                      placeholderTextColor={colors.placeholderText}
-                      value={newMenuItem.description}
-                      onChangeText={(text) => setNewMenuItem({...newMenuItem, description: text})}
-                      autoCapitalize="none"
-                    />
-                    <Button title="Save" onPress={handleSubmit} color={colors.buttonColor}/>
-                    <Button title="Cancel" onPress={() => setNewItemModalVisible(false)} color={'red'}/>
-                  </View>
-                </View>
-              </Modal>
-              <FlatList
-                data={menuItems}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                  <View style={styles.menuItem}>
-                    <Text style={styles.itemName}>{item.name} - ${item.price.toFixed(2)}</Text>
-                    <Text style={styles.itemDescription}>{item.description}</Text>
-                    <Text style={styles.itemDescription}>{item.category}</Text>
-                    <Button
-                      title="Edit"
-                      onPress={() => selectItemForEditing(item)}
-                      color={colors.buttonColor}
-                    />
-                  </View>
-                )}
-              />
-              <Button title="Close" onPress={() => setMenuModalVisible(false)} color={'red'}/>
+      <View style={styles.buttonSpacer} />
+
+      <Button 
+        title="Manage Menu" 
+        onPress={() => setMenuModalVisible(true)} 
+        color={colors.buttonColor}
+      />
+
+      <Modal visible={menuModalVisible} transparent={true} animationType="slide">
+        <ThemedView style={styles.modalContainer}>
+          <ThemedView style={styles.modalContent}>
+            <ThemedView style={styles.titleContainer}>
+              <ThemedText type="title">Menu Changes</ThemedText>
             </ThemedView>
+            <Button title="Add New Menu" onPress={() => setNewItemModalVisible(true)} color={colors.buttonColor}/>
+            <Modal visible={newItemModalVisible} transparent={true} animationType="slide">
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <ThemedView style={styles.titleContainer}>
+                    <ThemedText type="title">New/Edit Item</ThemedText>
+                  </ThemedView>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+                    placeholder="Name"
+                    placeholderTextColor={colors.placeholderText}
+                    value={newMenuItem.name}
+                    onChangeText={(text) => setNewMenuItem({...newMenuItem, name: text})}
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+                    placeholder="Price"
+                    placeholderTextColor={colors.placeholderText}
+                    value={newMenuItem.price ? String(newMenuItem.price) : ''}
+                    onChangeText={(text) => setNewMenuItem({...newMenuItem, price: parseFloat(text) || 0})}
+                    keyboardType="decimal-pad"
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+                    placeholder="Allergen"
+                    placeholderTextColor={colors.placeholderText}
+                    value={newMenuItem.allergen}
+                    onChangeText={(text) => setNewMenuItem({...newMenuItem, allergen: text})}
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+                    placeholder="Category"
+                    placeholderTextColor={colors.placeholderText}
+                    value={newMenuItem.category}
+                    onChangeText={(text) => setNewMenuItem({...newMenuItem, category: text})}
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.inputTextColor }]}
+                    placeholder="Description"
+                    placeholderTextColor={colors.placeholderText}
+                    value={newMenuItem.description}
+                    onChangeText={(text) => setNewMenuItem({...newMenuItem, description: text})}
+                    autoCapitalize="none"
+                  />
+                  <Button title="Save" onPress={handleSubmit} color={colors.buttonColor}/>
+                  <Button title="Cancel" onPress={() => setNewItemModalVisible(false)} color={'red'}/>
+                </View>
+              </View>
+            </Modal>
+            <FlatList
+              data={menuItems}
+              keyExtractor={(item) => item._id}
+              renderItem={({ item }) => (
+                <View style={styles.menuItem}>
+                  <Text style={styles.itemName}>{item.name} - ${item.price.toFixed(2)}</Text>
+                  <Text style={styles.itemDescription}>{item.description}</Text>
+                  <Text style={styles.itemDescription}>{item.category}</Text>
+                  <Button
+                    title="Edit"
+                    onPress={() => selectItemForEditing(item)}
+                    color={colors.buttonColor}
+                  />
+                </View>
+              )}
+            />
+            <Button title="Close" onPress={() => setMenuModalVisible(false)} color={'red'}/>
           </ThemedView>
-        </Modal>
-      </ParallaxScrollView>
-    
+        </ThemedView>
+      </Modal>
+    </ParallaxScrollView>
   );
 };
 
@@ -310,6 +323,10 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginTop: 20,
     marginBottom: 20, 
+  },
+  buttonSpacer: {
+    marginTop: 10,
+    marginBottom: 20,
   },
 });
 

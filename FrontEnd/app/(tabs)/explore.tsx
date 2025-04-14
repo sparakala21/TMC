@@ -102,9 +102,11 @@ export default function MenuScreen() {
 
   let cart = useState(user?.cart || []);
   //On Open if logged in pull cart from backend
-  if(loggedIn){
-    setCartFromAccount(cart);
-  } 
+  useEffect(() => {
+    if (loggedIn && user?.cart) {
+      setCartFromAccount(user.cart);
+    }
+  }, [loggedIn, user, setCartFromAccount]);
   //TO Add in future potentially.
   //switching pages and not closing app, store cart_context in backend only if user is loggedIn.
 
