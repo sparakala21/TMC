@@ -3,6 +3,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 const Links = require("links.json");
+const Text = require("websiteContentText.json");
 
 export default function HomeScreen() {
   
@@ -25,26 +26,23 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome to Thunder Mountain Curry!</ThemedText>
+        <ThemedText type="title">{Text.index.title}</ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Our Story</ThemedText>
+        <ThemedText type="subtitle">{Text.index.subtitle}</ThemedText>
         <ThemedText>
-          From our beginnings out of a hot dog cart to the RPI Student Union, the Troy Waterfront Farmer's Market, and our Pandemic Pop-Ups, TMC has never wavered from our mission - to bring the Troy, NY community a mouth-watering culinary adventure straight from the streets. Our new journey takes us back to our roots as a true street food experience. Follow us on Instagram and FaceBook to see where we're serving today!
+          {Text.index.description}
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Our Food</ThemedText>
+        <ThemedText type="subtitle">{Text.index.Subsection}</ThemedText>
         <ThemedText>
-          Thunder Mountain Curry focuses on quality ingredients and authentic Pan-Asian recipes with our own twist.  
-          TMC is a unique street food experience for those seeking a delicious and satisfying culinary adventure.
-        </ThemedText>
+          {Text.index.SubsectionDescription}</ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Visit Us</ThemedText>
+        <ThemedText type="subtitle">{Text.index.Subsection2}</ThemedText>
         <ThemedText>
-          Now at the Troy Waterfront Farmers Market and in front of the RPI Student Union - follow us to find out when!
-        </ThemedText>
+          {Text.index.SubsectionDescription2} </ThemedText>
         <ThemedView style={styles.imageRowContainer}>
           <TouchableOpacity onPress={handleInstaImagePress}>
             <Image
