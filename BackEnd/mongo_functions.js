@@ -91,6 +91,21 @@ app.get('/menuItems', async (req, res) => {
 });
 
 
+/**
+ * Updates a document in the 'menuItems' collection based on the provided filter.
+ *
+ * @param {Object} filter - The filter object to identify the document to update.
+ * @param {Object} updateDoc - The update operations to apply to the matched document.
+ *
+ * @returns {Promise} - A Promise that resolves to the result of the update operation.
+ * The result object contains the count of matched documents and modified documents.
+ *
+ * @example
+ * const filter = { _id: new ObjectId('1234567890abcdef12345678') };
+ * const updateDoc = { $set: { price: 10.99 } };
+ * const result = await updateMenuItems(filter, updateDoc);
+ * console.log(result); // { matchedCount: 1, modifiedCount: 1 }
+ */
 async function updateMenuItems(filter, updateDoc){
     const result = await menuItems.updateOne(filter, updateDoc);
     console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
@@ -123,6 +138,19 @@ app.put('/menuItems', async (req, res) => {
 
 
 
+/**
+ * Inserts a new document into the 'orders' collection.
+ *
+ * @param {Object} body - The document to insert.
+ *
+ * @returns {Promise} - A Promise that resolves to the result of the insert operation.
+ * The result object contains the inserted document's _id.
+ *
+ * @example
+ * const newOrder = { customerId: '123', items: ['item1', 'item2'], total: 25.99 };
+ * const orderId = await postOrders(newOrder);
+ * console.log('New order created with ID:', orderId);
+ */
 async function postOrders(body){
     const result = await orders.insertOne(body);
     console.log(
@@ -149,6 +177,22 @@ app.post('/orders', async (req, res) => {
 });
 
 
+/**
+ * Retrieves all documents from the 'orders' collection based on the provided query.
+ *
+ * @param {Object} [query={}] - The query object to identify the documents to retrieve.
+ *
+ * @returns {Promise} - A Promise that resolves to an array of the retrieved documents.
+ *
+ * @example
+ * const allOrders = await getAllOrders();
+ * console.log(allOrders); // [ { _id: ObjectId('1234567890abcdef12345678'), ... }, ... ]
+ *
+ * @example
+ * const query = { customerId: '123' };
+ * const customerOrders = await getAllOrders(query);
+ * console.log(customerOrders); // [ { _id: ObjectId('1234567890abcdef12345678'), customerId: '123', ... }, ... ]
+ */
 async function getAllOrders(query={}){
     const result = await orders.find(query).toArray();
     console.log("all items: ", result)
@@ -178,6 +222,21 @@ app.get('/orders', async (req, res) => {
 });
 
 
+/**
+ * Updates a document in the 'orders' collection based on the provided filter.
+ *
+ * @param {Object} filter - The filter object to identify the document to update.
+ * @param {Object} updateDoc - The update operations to apply to the matched document.
+ *
+ * @returns {Promise} - A Promise that resolves to the result of the update operation.
+ * The result object contains the count of matched documents and modified documents.
+ *
+ * @example
+ * const filter = { _id: new ObjectId('1234567890abcdef12345678') };
+ * const updateDoc = { $set: { price: 10.99 } };
+ * const result = await updateOrders(filter, updateDoc);
+ * console.log(result); // { matchedCount: 1, modifiedCount: 1 }
+ */
 async function updateOrders(filter, updateDoc){
     const result = await orders.updateOne(filter, updateDoc);
     console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
@@ -209,7 +268,43 @@ app.put('/orders', async (req, res) => {
 
 
 
+/**
+ * Inserts a new document into the 'accounts' collection.
+ *
+ * @param {Object} body - The document to insert.
+ *
+ * @returns {Promise} - A Promise that resolves to the result of the insert operation.
+ * The result object contains the inserted document's _id.
+ *
+ * @example
+ * const newAccount = { username: 'johndoe', password: 'password123' };
+ * const accountId = await postAccounts(newAccount);
+ * console.log('New account created with ID:', accountId);
+ */
 
+async function postAccounts(body){
+    const result = await accounts.insertOne(body);
+    console.log(
+        `new item in accounts created with the _id: ${result.insertedId}`,
+    );
+    return result.insertedId
+}
+
+/**
+ * Inserts a new document into the 'accounts' collection.
+ *
+ * @param {Object} body - The document to insert.
+ * @property {string} body.username - The username for the new account.
+ * @property {string} body.password - The password for the new account.
+ *
+ * @returns {Promise} - A Promise that resolves to the result of the insert operation.
+ * The result object contains the inserted document's _id.
+ *
+ * @example
+ * const newAccount = { username: 'johndoe', password: 'password123' };
+ * const accountId = await postAccounts(newAccount);
+ * console.log('New account created with ID:', accountId);
+ */
 async function postAccounts(body){
     const result = await accounts.insertOne(body);
     console.log(
