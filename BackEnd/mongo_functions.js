@@ -331,6 +331,22 @@ app.post('/accounts', async (req, res) => {
 });
 
 
+/**
+ * Retrieves all documents from the 'accounts' collection based on the provided query.
+ *
+ * @param {Object} [query={}] - The query object to identify the documents to retrieve.
+ *
+ * @returns {Promise} - A Promise that resolves to an array of the retrieved documents.
+ *
+ * @example
+ * const allAccounts = await getAllAccounts();
+ * console.log(allAccounts); // [ { _id: ObjectId('1234567890abcdef12345678'), ... }, ... ]
+ *
+ * @example
+ * const query = { username: 'johndoe' };
+ * const customerAccounts = await getAllAccounts(query);
+ * console.log(customerAccounts); // [ { _id: ObjectId('1234567890abcdef12345678'), username: 'johndoe', ... }, ... ]
+ */
 async function getAllAccounts(query={}){
     const result = await accounts.find(query).toArray();
     console.log("all items: ", result)
@@ -360,6 +376,22 @@ app.get('/accounts', async (req, res) => {
 });
 
 
+/**
+ * Updates a document in the 'accounts' collection based on the provided filter.
+ *
+ * @function updateAccounts
+ * @param {Object} filter - The filter object to identify the document to update.
+ * @param {Object} updateDoc - The update operations to apply to the matched document.
+ *
+ * @returns {Promise} - A Promise that resolves to the result of the update operation.
+ * The result object contains the count of matched documents and modified documents.
+ *
+ * @example
+ * const filter = { _id: new ObjectId('1234567890abcdef12345678') };
+ * const updateDoc = { $set: { password: 'newPassword123' } };
+ * const result = await updateAccounts(filter, updateDoc);
+ * console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
+ */
 async function updateAccounts(filter, updateDoc){
     const result = await accounts.updateOne(filter, updateDoc);
     console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
@@ -389,6 +421,24 @@ app.put('/accounts', async (req, res) => {
     }
 });
 
+/**
+ * Inserts a new document into the 'pickupLocations' collection.
+ *
+ * @function postPickupLocations
+ * @param {Object} body - The document to insert.
+ * @property {string} body.name - The name of the pickup location.
+ * @property {string} body.address - The address of the pickup location.
+ * @property {string} body.phoneNumber - The phone number of the pickup location.
+ * @property {boolean} body.active - The status of the pickup location (true for active, false for inactive).
+ *
+ * @returns {Promise} - A Promise that resolves to the result of the insert operation.
+ * The result object contains the inserted document's _id.
+ *
+ * @example
+ * const newPickupLocation = { name: 'Main Store', address: '123 Main St', phoneNumber: '555-1234', active: true };
+ * const pickupLocationId = await postPickupLocations(newPickupLocation);
+ * console.log('New pickup location created with ID:', pickupLocationId);
+ */
 async function postPickupLocations(body){
     const result = await pickupLocations.insertOne(body);
     console.log(
@@ -474,6 +524,22 @@ app.put('/pickupLocations', async (req, res) => {
 });
 
 
+/**
+ * Activates a pickup location by setting its 'active' status to true.
+ * Deactivates all other active pickup locations.
+ *
+ * @function ActivatePickupLocation
+ * @param {Object} filter - The filter object to identify the pickup location to activate.
+ * @property {ObjectId} filter._id - The ObjectId of the pickup location to activate.
+ *
+ * @returns {Promise} - A Promise that resolves to the result of the update operation.
+ * The result object contains the count of matched documents and modified documents.
+ *
+ * @example
+ * const idToActivate = {_id : new ObjectId('1234567890abcdef12345678')};
+ * const result = await ActivatePickupLocation(idToActivate);
+ * console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`);
+ */
 async function ActivatePickupLocation(filter){
     result = await pickupLocations.updateMany({active : true}, {$set : {active : false}});
     result = await pickupLocations.updateOne(filter, {$set: {active : true}});
@@ -502,6 +568,24 @@ app.post('/activateLocation', async (req, res) => {
 });
 
 
+/**
+ * Retrieves menu items from a given shopping cart.
+ *
+ * @function getMenuItemsFromCart
+ * @param {Array} cart - An array of objects representing items in the shopping cart.
+ * Each object in the array has a property '_id' representing the ObjectId of the menu item.
+ *
+ * @returns {Promise<Array>} - A Promise that resolves to an array of menu items.
+ * Each item in the array is an object representing a menu item.
+ *
+ * @example
+ * const cart = [
+ *   {_id: '1234567890abcdef12345678'},
+ *   {_id: '234567890123456789abcdef'},
+ * ];
+ * const menuItems = await getMenuItemsFromCart(cart);
+ * console.log(menuItems);
+ */
 async function getMenuItemsFromCart( cart ){
     let items = []
     for (let i = 0; i < cart.length; i++) { 
